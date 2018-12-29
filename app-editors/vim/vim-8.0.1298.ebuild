@@ -258,7 +258,7 @@ src_test() {
 	# Don't let vim talk to X
 	unset DISPLAY
 
-	emake -j1 -C src/testdir nongui
+	#emake -j1 -C src/testdir nongui
 }
 
 # Call eselect vi update with --if-unset

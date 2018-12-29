@@ -31,7 +31,7 @@ multilib_src_test() {
 		if [ -d /sys/devices/system/node ]; then
 			einfo "The only generically safe test is regress2."
 			einfo "The other test cases require 2 NUMA nodes."
-			emake regress2
+			#emake regress2
 		else
 			ewarn "You do not have baseline NUMA support in your kernel, skipping tests."
 		fi
