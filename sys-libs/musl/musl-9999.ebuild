@@ -3,7 +3,8 @@
 
 EAPI=7
 
-inherit flag-o-matic toolchain-funcs
+inherit flag-o-matic multilib multilib-minimal toolchain-funcs
+
 if [[ ${PV} == "9999" ]] ; then
 	EGIT_REPO_URI="git://git.musl-libc.org/musl"
 	inherit git-r3
@@ -32,6 +33,8 @@ HOMEPAGE="http://www.musl-libc.org/"
 LICENSE="MIT LGPL-2 GPL-2"
 SLOT="0"
 IUSE="headers-only"
+
+MULTILIB_WRAPPED_HEADERS=( /usr/include/bits/{alltypes.h,dirent.h,errno.h,fcntl.h,fenv.h,float.h,hwcap.h,io.h,ioctl.h,ioctl_fix.h,ipc.h,ipcstat.h,kd.h,limits.h,link.h,mman.h,msg.h,poll.h,posix.h,ptrace.h,reg.h,resource.h,sem.h,setjmp.h,shm.h,signal.h,socket.h,soundcard.h,stat.h,statfs.h,stdint.h,syscall.h,termios.h,user.h,vt.h} )
 
 QA_SONAME="/usr/lib/libc.so"
 QA_DT_NEEDED="/usr/lib/libc.so"
@@ -71,25 +74,26 @@ src_unpack() {
 	cp "${DISTDIR}"/iconv.c misc/iconv.c || die
 }
 
-src_configure() {
+multilib_src_configure() {
 	tc-getCC ${CTARGET}
 	just_headers && export CC=true
 
 	local sysroot
 	is_crosscompile && sysroot="${EPREFIX}"/usr/${CTARGET}
-	./configure \
+	${S}/configure \
 		--target=${CTARGET} \
 		--prefix=${sysroot}/usr \
+		--libdir=${sysroot}/usr/$(get_libdir) \
 		--syslibdir=${sysroot}/lib \
 		--disable-gcc-wrapper || die
 }
 
-src_compile() {
+multilib_src_compile() {
 	emake obj/include/bits/alltypes.h
 	just_headers && return 0
 
-	emake
-	if [[ ${CATEGORY} != cross-* ]] ; then
+	emake AR=$(tc-getAR) RANLIB=$(tc-getRANLIB)
+	if [[ ${CATEGORY} != cross-* ]] && multilib_is_native_abi; then
 		emake -C "${T}" getconf getent iconv \
 			CC="$(tc-getCC)" \
 			CFLAGS="${CFLAGS}" \
@@ -102,35 +106,38 @@ src_compile() {
 	$(tc-getAR) -rcs libssp_nonshared.a libssp_nonshared.o || die
 }
 
-src_install() {
+multilib_src_install() {
 	local target="install"
 	just_headers && target="install-headers"
 	emake DESTDIR="${D}" ${target}
 	just_headers && return 0
 
 	# musl provides ldd via a sym link to its ld.so
+	# Fish out of config:
+	#   ARCH = ...
+	#   SUBARCH = ...
+	# and print $(ARCH)$(SUBARCH).
+	local arch=$(awk '{ k[$1] = $3 } END { printf("%s%s", k["ARCH"], k["SUBARCH"]); }' config.mak)
 	local sysroot
 	is_crosscompile && sysroot=/usr/${CTARGET}
-	local ldso=$(basename "${D}"${sysroot}/lib/ld-musl-*)
-	dosym ${sysroot}/lib/${ldso} ${sysroot}/usr/bin/ldd
+	dosym ../../lib/ld-musl-${arch}.so.1 ${sysroot}/usr/bin/${CTARGET}-ldd
+	multilib_is_native_abi && dosym ${CTARGET}-ldd ${sysroot}/usr/bin/ldd
 
 	if [[ ${CATEGORY} != cross-* ]] ; then
-		# Fish out of config:
-		#   ARCH = ...
-		#   SUBARCH = ...
-		# and print $(ARCH)$(SUBARCH).
-		local arch=$(awk '{ k[$1] = $3 } END { printf("%s%s", k["ARCH"], k["SUBARCH"]); }' config.mak)
 		[[ -e "${D}"/lib/ld-musl-${arch}.so.1 ]] || die
 		cp "${FILESDIR}"/ldconfig.in "${T}" || die
-		sed -e "s|@@ARCH@@|${arch}|" "${T}"/ldconfig.in > "${T}"/ldconfig || die
+		sed -e "s|@@ARCH@@|${arch}|" "${T}"/ldconfig.in > "${T}"/${CTARGET}-ldconfig || die
 		into /
-		dosbin "${T}"/ldconfig
+		dosbin "${T}"/${CTARGET}-ldconfig
 		into /usr
-		dobin "${T}"/getconf
-		dobin "${T}"/getent
-		dobin "${T}"/iconv
-		echo 'LDPATH="include ld.so.conf.d/*.conf"' > "${T}"/00musl || die
-		doenvd "${T}"/00musl
+		if multilib_is_native_abi; then
+			dosym ${CTARGET}-ldconfig /sbin/ldconfig
+			dobin "${T}"/getconf
+			dobin "${T}"/getent
+			dobin "${T}"/iconv
+			echo 'LDPATH="include ld.so.conf.d/*.conf"' > "${T}"/00musl || die
+			doenvd "${T}"/00musl
+		fi
 		dolib.a libssp_nonshared.a
 	fi
 }
@@ -140,5 +147,5 @@ pkg_postinst() {
 
 	[ "${ROOT}" != "/" ] && return 0
 
-	ldconfig || die
+	ldconfig -NX || die
 }
