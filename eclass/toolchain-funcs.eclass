@@ -978,7 +978,7 @@ gen_usr_ldscript() {
 	*-darwin*) ;;
 	*-android*) return 0 ;;
 	*linux*|*-freebsd*|*-openbsd*|*-netbsd*)
-		use prefix && return 0 ;;
+		return 0 ;;
 	*) return 0 ;;
 	esac
 
