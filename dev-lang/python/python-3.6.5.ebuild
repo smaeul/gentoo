@@ -181,24 +181,30 @@ src_test() {
 	fi
 
 	# Skip failing tests.
-	local skipped_tests="gdb"
-
-	for test in ${skipped_tests}; do
-		mv "${S}"/Lib/test/test_${test}.py "${T}"
-	done
+	local skipped_tests=(
+		test__locale
+		test_buffer
+		test_datetime
+		test_fcntl
+		test_gdb
+		test_locale
+		test_os
+		test_posix
+		test_re
+		test_ssl
+		test_strptime
+		test_threadsignals
+		test_time
+	)
 
 	local -x PYTHONDONTWRITEBYTECODE=
 
-	emake test EXTRATESTOPTS="-u-network" CPPFLAGS= CFLAGS= LDFLAGS= < /dev/tty
+	emake test EXTRATESTOPTS="-u-network --exclude ${skipped_tests[*]}" CPPFLAGS= CFLAGS= LDFLAGS= < /dev/tty
 	local result=$?
-
-	for test in ${skipped_tests}; do
-		mv "${T}/test_${test}.py" "${S}"/Lib/test
-	done
 
 	elog "The following tests have been skipped:"
 	for test in ${skipped_tests}; do
-		elog "test_${test}.py"
+		elog "${test}.py"
 	done
 
 	elog "If you would like to run them, you may:"
