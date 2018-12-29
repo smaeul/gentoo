@@ -487,6 +487,7 @@ multilib_toolchain_setup() {
 	local save_restore_variables=(
 		CBUILD
 		CHOST
+		CTARGET
 		AR
 		CC
 		CXX
@@ -528,6 +529,10 @@ multilib_toolchain_setup() {
 		# Set CBUILD only if not cross-compiling.
 		if [[ ${CBUILD} == "${CHOST}" ]]; then
 			export CBUILD=$(get_abi_CHOST $1)
+		fi
+		# Set CTARGET only if not cross-compiling.
+		if [[ ${CTARGET} == "${CHOST}" ]]; then
+			export CTARGET=$(get_abi_CHOST $1)
 		fi
 
 		# Set the CHOST native first so that we pick up the native
