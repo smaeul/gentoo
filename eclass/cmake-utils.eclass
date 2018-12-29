@@ -631,10 +631,11 @@ cmake-utils_src_configure() {
 
 	# Common configure parameters (invariants)
 	local common_config=${BUILD_DIR}/gentoo_common_config.cmake
-	local libdir=$(get_libdir)
+	local incdir=$(get_incdir) libdir=$(get_libdir)
 	cat > "${common_config}" <<- _EOF_ || die
 		SET (CMAKE_GENTOO_BUILD ON CACHE BOOL "Indicate Gentoo package build")
 		SET (LIB_SUFFIX ${libdir/lib} CACHE STRING "library path suffix" FORCE)
+		SET (CMAKE_INSTALL_INCLUDEDIR ${incdir} CACHE PATH "Output directory for headers")
 		SET (CMAKE_INSTALL_LIBDIR ${libdir} CACHE PATH "Output directory for libraries")
 		SET (CMAKE_INSTALL_INFODIR "${EPREFIX}/usr/share/info" CACHE PATH "")
 		SET (CMAKE_INSTALL_MANDIR "${EPREFIX}/usr/share/man" CACHE PATH "")

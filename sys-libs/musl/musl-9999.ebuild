@@ -64,6 +64,8 @@ multilib_src_configure() {
 	${S}/configure \
 		--target=${CTARGET} \
 		--prefix=${sysroot}/usr \
+		--includedir=${sysroot}/usr/$(get_incdir) \
+		--libdir=${sysroot}/usr/$(get_libdir) \
 		--syslibdir=${sysroot}/lib \
 		--disable-gcc-wrapper || die
 }
@@ -93,7 +95,7 @@ multilib_src_install() {
 	dosym ${sysroot}/lib/${ldso} ${sysroot}/usr/bin/ldd
 
 	if [[ ${CATEGORY} != cross-* ]] ; then
-		local arch=$("${D}"usr/lib/libc.so 2>&1 | sed -n '1s/^musl libc (\(.*\))$/\1/p')
+		local arch=$("${D}"usr/$(get_libdir)/libc.so 2>&1 | sed -n '1s/^musl libc (\(.*\))$/\1/p')
 		[[ -e "${D}"/lib/ld-musl-${arch}.so.1 ]] || die
 		cp "${FILESDIR}"/ldconfig.in "${T}" || die
 		sed -e "s|@@ARCH@@|${arch}|" "${T}"/ldconfig.in > "${T}"/${CTARGET}-ldconfig || die

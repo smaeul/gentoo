@@ -49,6 +49,9 @@ has_multilib_profile() {
 #   depend on a newer version of portage (not yet released) which uses these
 #   over CONF_LIBDIR in econf, dolib, etc...
 if has "${EAPI:-0}" 0 1 2 3 4 5; then
+	get_incdir() {
+		get_abi_INCDIR
+	}
 	get_libdir() {
 		local CONF_LIBDIR
 		if [ -n  "${CONF_LIBDIR_OVERRIDE}" ] ; then
@@ -110,6 +113,12 @@ get_abi_CTARGET() { get_abi_var CTARGET "$@"; }
 # @DESCRIPTION:
 # Alias for 'get_abi_var FAKE_TARGETS'
 get_abi_FAKE_TARGETS() { get_abi_var FAKE_TARGETS "$@"; }
+
+# @FUNCTION: get_abi_INCDIR
+# @USAGE: [ABI]
+# @DESCRIPTION:
+# Alias for 'get_abi_var LIBDIR'
+get_abi_INCDIR() { get_abi_var INCDIR "$@"; }
 
 # @FUNCTION: get_abi_LIBDIR
 # @USAGE: [ABI]

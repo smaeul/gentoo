@@ -41,6 +41,7 @@ multilib_src_configure() {
 multilib_src_install() {
 	emake \
 		prefix="${ED}usr" \
+		includedir="${ED}usr/$(get_incdir)" \
 		libdir="${ED}usr/$(get_libdir)" \
 		install \
 		install-compat \

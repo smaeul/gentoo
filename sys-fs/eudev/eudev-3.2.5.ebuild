@@ -100,21 +100,21 @@ multilib_src_configure() {
 		ac_cv_header_sys_capability_h=yes
 		DBUS_CFLAGS=' '
 		DBUS_LIBS=' '
-		--with-rootprefix=
+		--with-rootprefix=/usr
 		--with-rootrundir=/run
 		--libdir="${EPREFIX}"/usr/$(get_libdir)
 		--with-rootlibexecdir="${EPREFIX}"/lib/udev
-		--enable-split-usr
+		--disable-split-usr
 		--enable-manpages
 		--disable-hwdb
-		--exec-prefix="${EPREFIX}"
+		--exec-prefix="${EPREFIX}/usr"
 	)
 
 	# Only build libudev for non-native_abi, and only install it to libdir,
 	# that means all options only apply to native_abi
 	if multilib_is_native_abi; then
 		econf_args+=(
-			--with-rootlibdir="${EPREFIX}"/$(get_libdir)
+			--with-rootlibdir="${EPREFIX}"/usr/$(get_libdir)
 			$(use_enable introspection)
 			$(use_enable kmod)
 			$(use_enable static-libs static)

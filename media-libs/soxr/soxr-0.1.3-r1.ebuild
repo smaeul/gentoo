@@ -38,6 +38,7 @@ src_configure() {
 	if use examples ; then
 		mycmakeargs+=(
 			-DDOC_INSTALL_DIR="/usr/share/doc/${PF}"
+			-DINCLUDE_INSTALL_DIR="/usr/$(get_incdir)"
 		)
 	fi
 	cmake-multilib_src_configure

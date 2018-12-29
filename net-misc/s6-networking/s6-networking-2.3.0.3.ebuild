@@ -44,9 +44,9 @@ src_prepare() {
 src_configure() {
 	econf \
 		--bindir=/bin \
-		--dynlibdir=/$(get_libdir) \
+		--dynlibdir=/usr/$(get_libdir) \
 		--libdir=/usr/$(get_libdir)/${PN} \
-		--with-dynlib=/$(get_libdir) \
+		--with-dynlib=/usr/$(get_libdir) \
 		--with-lib=/usr/$(get_libdir)/s6 \
 		--with-lib=/usr/$(get_libdir)/s6-dns \
 		--with-lib=/usr/$(get_libdir)/skalibs \

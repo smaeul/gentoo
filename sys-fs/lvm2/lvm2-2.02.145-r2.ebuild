@@ -168,7 +168,7 @@ src_configure() {
 		--exec-prefix="${EPREFIX}" \
 		--sbindir="${EPREFIX}/sbin" \
 		--with-staticdir="${EPREFIX}"/sbin \
-		--libdir="${EPREFIX}/$(get_libdir)" \
+		--libdir="${EPREFIX}/usr/$(get_libdir)" \
 		--with-usrlibdir="${EPREFIX}/usr/$(get_libdir)" \
 		--with-default-dm-run-dir=/run \
 		--with-default-run-dir=/run/lvm \

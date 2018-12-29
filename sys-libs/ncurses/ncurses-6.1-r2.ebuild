@@ -171,7 +171,7 @@ do_configure() {
 		# "ncurses" to "${prefix}/include" if "${prefix}" is not /usr.
 		conf+=( --enable-overwrite )
 	else
-		conf+=( --includedir="${EPREFIX}"/usr/include/${target} )
+		conf+=( --includedir="${EPREFIX}"/usr/$(get_incdir)/${target} )
 	fi
 	# See comments in src_configure.
 	if [[ ${target} != "cross" ]] ; then

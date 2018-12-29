@@ -51,7 +51,7 @@ src_install() {
 
 	# pkg-config file hardcodes python sitedir, bug 486512
 	sed -i -e '/pythondir/s:=.*$:=/dev/null:' \
-		"${ED}"/usr/lib*/pkgconfig/xcb-proto.pc || die
+		"${ED}"/usr/$(get_libdir)/pkgconfig/xcb-proto.pc || die
 }
 
 multilib_src_install() {

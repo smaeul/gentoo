@@ -127,8 +127,10 @@ src_prepare() {
 
 	# Add gcc libs to the default link paths
 	sed -i \
-		-e "s|@GENTOO_PORTAGE_GCCLIBDIR@|${EPREFIX}/usr/${CHOST}/lib/|g" \
+		-e "s|@GENTOO_PORTAGE_GCCLIBDIR@|${EPREFIX}/usr/${CHOST}/lib|g" \
 		-e "s|@GENTOO_PORTAGE_EPREFIX@|${EPREFIX}/|g" \
+		-e "s|@GENTOO_PORTAGE_INCDIR@|$(get_incdir)|g" \
+		-e "s|@GENTOO_PORTAGE_LIBDIR@|$(get_libdir)|g" \
 		Modules/Platform/{UnixPaths,Darwin}.cmake || die "sed failed"
 	if ! has_version \>=${CATEGORY}/${PN}-3.4.0_rc1 ; then
 		CMAKE_BINARY="${S}/Bootstrap.cmk/cmake"

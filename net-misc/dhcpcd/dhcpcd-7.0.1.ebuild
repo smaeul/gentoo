@@ -36,7 +36,7 @@ src_configure()
 	use kernel_linux && rundir="--rundir=${EPREFIX}/run"
 	econf \
 		--prefix="${EPREFIX}" \
-		--libexecdir="${EPREFIX}/lib/dhcpcd" \
+		--libexecdir="${EPREFIX}/usr/$(get_libdir)/dhcpcd" \
 		--dbdir="${EPREFIX}/var/lib/dhcpcd" \
 		--localstatedir="${EPREFIX}/var" \
 		${rundir} \

@@ -30,7 +30,7 @@ src_prepare() {
 src_configure() {
 	econf \
 		--datadir=/etc \
-		--dynlibdir=/$(get_libdir) \
+		--dynlibdir=/usr/$(get_libdir) \
 		--libdir=/usr/$(get_libdir)/${PN} \
 		--sysdepdir=/usr/$(get_libdir)/${PN} \
 		--enable-clock \

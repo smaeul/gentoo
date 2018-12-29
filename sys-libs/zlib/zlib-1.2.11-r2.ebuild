@@ -48,6 +48,7 @@ multilib_src_configure() {
 		echoit "${S}"/configure \
 			--shared \
 			--prefix="${EPREFIX}/usr" \
+			--includedir="${EPREFIX}/usr/$(get_incdir)" \
 			--libdir="${EPREFIX}/usr/$(get_libdir)" \
 			${uname:+--uname=${uname}} \
 			|| die
@@ -72,7 +73,7 @@ multilib_src_compile() {
 			-e 's|@exec_prefix@|${prefix}|g' \
 			-e 's|@libdir@|${exec_prefix}/'$(get_libdir)'|g' \
 			-e 's|@sharedlibdir@|${exec_prefix}/'$(get_libdir)'|g' \
-			-e 's|@includedir@|${prefix}/include|g' \
+			-e 's|@includedir@|${prefix}/'$(get_incdir)'|g' \
 			-e 's|@VERSION@|'${PV}'|g' \
 			zlib.pc.in > zlib.pc || die
 		;;
@@ -95,7 +96,7 @@ multilib_src_install() {
 		emake -f win32/Makefile.gcc install \
 			BINARY_PATH="${ED}/usr/bin" \
 			LIBRARY_PATH="${ED}/usr/$(get_libdir)" \
-			INCLUDE_PATH="${ED}/usr/include" \
+			INCLUDE_PATH="${ED}/usr/$(get_incdir)" \
 			SHARED_MODE=1
 		# overwrites zlib.pc created from win32/Makefile.gcc #620136
 		insinto /usr/$(get_libdir)/pkgconfig
@@ -107,11 +108,11 @@ multilib_src_install() {
 		gen_usr_ldscript -a z
 		;;
 	esac
-	sed_macros "${ED}"/usr/include/*.h
+	sed_macros "${ED}"/usr/$(get_incdir)/*.h
 
 	if use minizip ; then
 		emake -C contrib/minizip install DESTDIR="${D}"
-		sed_macros "${ED}"/usr/include/minizip/*.h
+		sed_macros "${ED}"/usr/$(get_incdir)/minizip/*.h
 	fi
 
 	use static-libs || rm -f "${ED}"/usr/$(get_libdir)/lib{z,minizip}.{a,la} #419645

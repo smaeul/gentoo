@@ -78,7 +78,7 @@ src_configure() {
 	# We disable autotool python integration so we can use eclasses
 	# for proper integration with multiple python versions.
 	econf \
-		--sbindir=/sbin \
+		--sbindir=/usr/bin \
 		--enable-shared \
 		--disable-python \
 		$(use_enable static static-cryptsetup) \
