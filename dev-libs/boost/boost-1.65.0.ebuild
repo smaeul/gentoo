@@ -156,11 +156,6 @@ src_configure() {
 		compilerExecutable=$(tc-getCXX)
 	fi
 
-	# bug 298489
-	if use ppc || use ppc64; then
-		[[ $(gcc-version) > 4.3 ]] && append-flags -mno-altivec
-	fi
-
 	# Use C++14 globally as of 1.62
 	append-cxxflags -std=c++14
 
