@@ -72,7 +72,7 @@ src_prepare() {
 
 	default
 
-	sed -i -e "s:@@GENTOO_LIBDIR@@:$(get_libdir):g" \
+	sed -i -e "s:@@GENTOO_LIBDIR@@:lib:g" \
 		Lib/distutils/command/install.py \
 		Lib/distutils/sysconfig.py \
 		Lib/site.py \
@@ -138,7 +138,9 @@ src_configure() {
 		--enable-shared
 		$(use_enable ipv6)
 		$(use_with threads)
+		--includedir='${prefix}/include'
 		--infodir='${prefix}/share/info'
+		--libdir='${exec_prefix}/lib'
 		--mandir='${prefix}/share/man'
 		--with-computed-gotos
 		--with-dbmliborder="${dbmliborder}"
@@ -217,7 +219,7 @@ src_test() {
 }
 
 src_install() {
-	local libdir=${ED}/usr/$(get_libdir)/python${PYVER}
+	local libdir=${ED}/usr/lib/python${PYVER}
 
 	emake DESTDIR="${D}" altinstall
 
