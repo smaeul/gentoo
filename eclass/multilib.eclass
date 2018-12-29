@@ -433,7 +433,7 @@ multilib_toolchain_setup() {
 
 	# First restore any saved state we have laying around.
 	if [[ ${_DEFAULT_ABI_SAVED} == "true" ]] ; then
-		for v in CHOST CBUILD AS CC CXX F77 FC LD PKG_CONFIG_{LIBDIR,PATH} ; do
+		for v in CHOST CBUILD CTARGET AS CC CXX F77 FC LD PKG_CONFIG_{LIBDIR,PATH} ; do
 			vv="_abi_saved_${v}"
 			[[ ${!vv+set} == "set" ]] && export ${v}="${!vv}" || unset ${v}
 			unset ${vv}
@@ -445,7 +445,7 @@ multilib_toolchain_setup() {
 	# screws up ccache and distcc.  See #196243 for more info.
 	if [[ ${ABI} != ${DEFAULT_ABI} ]] ; then
 		# Back that multilib-ass up so we can restore it later
-		for v in CHOST CBUILD AS CC CXX F77 FC LD PKG_CONFIG_{LIBDIR,PATH} ; do
+		for v in CHOST CBUILD CTARGET AS CC CXX F77 FC LD PKG_CONFIG_{LIBDIR,PATH} ; do
 			vv="_abi_saved_${v}"
 			[[ ${!v+set} == "set" ]] && export ${vv}="${!v}" || unset ${vv}
 		done
@@ -454,6 +454,10 @@ multilib_toolchain_setup() {
 		# Set CBUILD only if not cross-compiling.
 		if [[ ${CBUILD} == "${CHOST}" ]]; then
 			export CBUILD=$(get_abi_CHOST $1)
+		fi
+		# Set CTARGET only if not cross-compiling.
+		if [[ ${CTARGET} == "${CHOST}" ]]; then
+			export CTARGET=$(get_abi_CHOST $1)
 		fi
 
 		# Set the CHOST native first so that we pick up the native
