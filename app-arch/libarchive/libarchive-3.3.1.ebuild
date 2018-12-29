@@ -97,7 +97,7 @@ multilib_src_install() {
 		emake DESTDIR="${D}" install
 
 		# Create symlinks for FreeBSD
-		if ! use prefix && [[ ${CHOST} == *-freebsd* ]]; then
+		if ! use prefix; then
 			# Exclude cat for the time being #589876
 			for bin in cpio tar; do
 				dosym bsd${bin} /usr/bin/${bin}
