@@ -16,11 +16,9 @@ SLOT="0"
 
 DEPEND="
 	dev-go/go-bindata
-	sys-libs/pam
 "
 RDEPEND="
 	dev-vcs/git
-	sys-libs/pam
 "
 
 pkg_setup() {
@@ -36,7 +34,7 @@ src_prepare() {
 
 src_compile() {
 	GOPATH="${WORKDIR}/${P}:$(get_golibdir_gopath)" emake -C src/${EGO_PN} generate
-	TAGS="bindata pam sqlite" LDFLAGS="" CGO_LDFLAGS="" GOPATH="${WORKDIR}/${P}:$(get_golibdir_gopath)" emake -C src/${EGO_PN} build
+	TAGS="bindata sqlite" LDFLAGS="" CGO_LDFLAGS="" GOPATH="${WORKDIR}/${P}:$(get_golibdir_gopath)" emake -C src/${EGO_PN} build
 }
 
 src_install() {
