@@ -18,6 +18,8 @@ VERIFY_SIG_OPENPGP_KEY_PATH="${BROOT}"/usr/share/openpgp-keys/netfilter.org.asc
 
 BDEPEND="verify-sig? ( sec-keys/openpgp-keys-netfilter )"
 
+DEPEND="elibc_musl? ( sys-libs/queue-standalone )"
+
 src_configure() {
 	econf $(use_enable static-libs static)
 }
