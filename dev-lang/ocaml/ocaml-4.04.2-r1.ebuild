@@ -109,6 +109,13 @@ src_install() {
 		MANDIR="${ED}"/usr/share/man \
 		install
 
+	if use ocamlopt ; then
+		emake BINDIR="${ED}"/usr/bin \
+			LIBDIR="${ED}"/usr/$(get_libdir)/ocaml \
+			MANDIR="${ED}"/usr/share/man \
+			installopt installoptopt
+	fi
+
 	# Symlink the headers to the right place
 	dodir /usr/include
 	dosym /usr/$(get_libdir)/ocaml/caml /usr/include/caml
