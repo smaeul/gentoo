@@ -135,8 +135,9 @@ perf_make() {
 	emake V=1 \
 		CC="$(tc-getCC)" AR="$(tc-getAR)" LD="$(tc-getLD)" \
 		prefix="${EPREFIX}/usr" bindir_relative="bin" \
-		EXTRA_CFLAGS="${CFLAGS}" \
+		EXTRA_CFLAGS="${CFLAGS} -include linux/stddef.h" \
 		ARCH="${arch}" \
+		LIBC_SUPPORT=1 \
 		NO_DEMANGLE=$(puse demangle) \
 		NO_GTK2=$(puse gtk) \
 		NO_LIBAUDIT=$(puse audit) \
