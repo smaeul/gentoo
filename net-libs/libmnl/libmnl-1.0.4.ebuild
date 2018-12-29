@@ -13,6 +13,7 @@ LICENSE="LGPL-2.1"
 SLOT="0/0.2.0"
 KEYWORDS="alpha amd64 arm ~arm64 hppa ia64 ~m68k ~mips ppc ppc64 ~s390 ~sh sparc x86 ~amd64-linux"
 IUSE="examples static-libs"
+DEPEND="elibc_musl? ( sys-libs/queue-standalone )"
 
 src_configure() {
 	econf $(use_enable static-libs static)
