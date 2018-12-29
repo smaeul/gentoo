@@ -12,17 +12,8 @@ cmdname=$(basename "$0")
 ##
 ## Variables
 ##
-MOZ_ARCH=$(uname -m)
-case ${MOZ_ARCH} in
-	x86_64|s390x|sparc64)
-		MOZ_LIB_DIR="@PREFIX@/lib64"
-		SECONDARY_LIB_DIR="@PREFIX@/lib"
-		;;
-	*)
-		MOZ_LIB_DIR="@PREFIX@/lib"
-		SECONDARY_LIB_DIR="@PREFIX@/lib64"
-		;;
-esac
+MOZ_LIB_DIR="@LIBDIR@"
+SECONDARY_LIB_DIR="/dev/null"
 
 MOZ_FIREFOX_FILE="firefox"
 
