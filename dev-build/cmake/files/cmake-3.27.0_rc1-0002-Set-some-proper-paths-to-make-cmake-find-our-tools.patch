@@ -73,7 +73,7 @@ Updated by Jacob Floyd (cmake-3.19.2)
  
    # CMake install location
    "${_CMAKE_INSTALL_DIR}"
-@@ -58,17 +59,33 @@ list(APPEND CMAKE_SYSTEM_PREFIX_PATH
+@@ -58,17 +59,29 @@ list(APPEND CMAKE_SYSTEM_PREFIX_PATH
  
  # List common include file locations not under the common prefixes.
  list(APPEND CMAKE_SYSTEM_INCLUDE_PATH
@@ -87,9 +87,8 @@ Updated by Jacob Floyd (cmake-3.19.2)
 -  /usr/lib/X11
 +  @GENTOO_PORTAGE_GCCLIBDIR@/gcc
 +  @GENTOO_PORTAGE_GCCLIBDIR@
-+  @GENTOO_PORTAGE_EPREFIX@usr/lib64
-+  @GENTOO_PORTAGE_EPREFIX@usr/libx32
-+  @GENTOO_PORTAGE_EPREFIX@usr/lib32
++  @GENTOO_PORTAGE_EPREFIX@usr/@GENTOO_PORTAGE_LIBDIR@
++  @GENTOO_PORTAGE_EPREFIX@@GENTOO_PORTAGE_LIBDIR@
 +  @GENTOO_PORTAGE_EPREFIX@usr/lib
 +  @GENTOO_PORTAGE_EPREFIX@lib
 +  )
@@ -103,12 +102,9 @@ Updated by Jacob Floyd (cmake-3.19.2)
 -  /lib /lib32 /lib64 /usr/lib /usr/lib32 /usr/lib64
 +  @GENTOO_PORTAGE_GCCLIBDIR@/gcc
 +  @GENTOO_PORTAGE_GCCLIBDIR@
-+  @GENTOO_PORTAGE_EPREFIX@usr/lib64
-+  @GENTOO_PORTAGE_EPREFIX@usr/libx32
-+  @GENTOO_PORTAGE_EPREFIX@usr/lib32
-+  @GENTOO_PORTAGE_EPREFIX@usr/lib
-+  @GENTOO_PORTAGE_EPREFIX@lib
-+  @GENTOO_HOST@/lib /usr/lib /usr/lib32 /usr/lib64 /usr/libx32
++  @GENTOO_PORTAGE_EPREFIX@usr/@GENTOO_PORTAGE_LIBDIR@
++  @GENTOO_PORTAGE_EPREFIX@@GENTOO_PORTAGE_LIBDIR@
++  @GENTOO_HOST@/lib /usr/lib
    )
  
  if(CMAKE_SYSROOT_COMPILE)

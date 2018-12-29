@@ -1158,6 +1158,7 @@ src_install() {
 	# Update wrapper
 	sed -i \
 		-e "s:@PREFIX@:${EPREFIX}/usr:" \
+		-e "s:@LIBDIR@:${EPREFIX}/usr/$(get_libdir):" \
 		-e "s:@DEFAULT_WAYLAND@:${use_wayland}:" \
 		"${ED}/usr/bin/${PN}" || die
 }
