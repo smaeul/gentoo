@@ -3,7 +3,8 @@
 
 EAPI=6
 
-inherit eutils flag-o-matic multilib toolchain-funcs
+inherit eutils flag-o-matic multilib multilib-minimal toolchain-funcs
+
 if [[ ${PV} == "9999" ]] ; then
 	EGIT_REPO_URI="git://git.musl-libc.org/musl"
 	inherit git-r3
@@ -54,32 +55,32 @@ pkg_setup() {
 	fi
 }
 
-src_configure() {
+multilib_src_configure() {
 	tc-getCC ${CTARGET}
 	just_headers && export CC=true
 
 	local sysroot
 	is_crosscompile && sysroot=/usr/${CTARGET}
-	./configure \
+	${S}/configure \
 		--target=${CTARGET} \
 		--prefix=${sysroot}/usr \
 		--syslibdir=${sysroot}/lib \
 		--disable-gcc-wrapper || die
 }
 
-src_compile() {
+multilib_src_compile() {
 	emake obj/include/bits/alltypes.h
 	just_headers && return 0
 
-	emake
-	if [[ ${CATEGORY} != cross-* ]] ; then
+	emake AR=$(tc-getAR) RANLIB=$(tc-getRANLIB)
+	if [[ ${CATEGORY} != cross-* ]] && multilib_is_native_abi; then
 		$(tc-getCC) ${CFLAGS} "${DISTDIR}"/getconf.c -o "${T}"/getconf || die
 		$(tc-getCC) ${CFLAGS} "${DISTDIR}"/getent.c -o "${T}"/getent || die
 		$(tc-getCC) ${CFLAGS} "${DISTDIR}"/iconv.c -o "${T}"/iconv || die
 	fi
 }
 
-src_install() {
+multilib_src_install() {
 	local target="install"
 	just_headers && target="install-headers"
 	emake DESTDIR="${D}" ${target}
@@ -95,9 +96,10 @@ src_install() {
 		local arch=$("${D}"usr/lib/libc.so 2>&1 | sed -n '1s/^musl libc (\(.*\))$/\1/p')
 		[[ -e "${D}"/lib/ld-musl-${arch}.so.1 ]] || die
 		cp "${FILESDIR}"/ldconfig.in "${T}" || die
-		sed -e "s|@@ARCH@@|${arch}|" "${T}"/ldconfig.in > "${T}"/ldconfig || die
+		sed -e "s|@@ARCH@@|${arch}|" "${T}"/ldconfig.in > "${T}"/${CTARGET}-ldconfig || die
 		into /
-		dosbin "${T}"/ldconfig
+		dosbin "${T}"/${CTARGET}-ldconfig
+		multilib_is_native_abi && dosym ${CTARGET}-ldconfig /sbin/ldconfig
 		into /usr
 		dobin "${T}"/getconf
 		dobin "${T}"/getent
