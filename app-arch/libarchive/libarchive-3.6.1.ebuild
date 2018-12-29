@@ -112,6 +112,11 @@ multilib_src_test() {
 multilib_src_install() {
 	if multilib_is_native_abi ; then
 		emake DESTDIR="${D}" install
+		for bin in cpio tar; do
+			dosym bsd${bin} /usr/bin/${bin}
+			echo ".so bsd${bin}.1" > "${T}"/${bin}.1
+			doman "${T}"/${bin}.1
+		done
 	else
 		local install_targets=(
 			install-includeHEADERS
