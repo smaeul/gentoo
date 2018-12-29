@@ -101,14 +101,14 @@ multilib_src_configure() {
 		ac_cv_header_sys_capability_h=yes
 		DBUS_CFLAGS=' '
 		DBUS_LIBS=' '
-		--with-rootprefix=
+		--with-rootprefix=/usr
 		--with-rootrundir=/run
-		--exec-prefix="${EPREFIX}"
-		--bindir="${EPREFIX}"/bin
+		--exec-prefix="${EPREFIX}/usr"
+		--bindir="${EPREFIX}"/usr/bin
 		--includedir="${EPREFIX}"/usr/include
 		--libdir="${EPREFIX}"/usr/$(get_libdir)
 		--with-rootlibexecdir="${EPREFIX}"/lib/udev
-		--enable-split-usr
+		--disable-split-usr
 		--enable-manpages
 	)
 
@@ -116,7 +116,7 @@ multilib_src_configure() {
 	# that means all options only apply to native_abi
 	if multilib_is_native_abi; then
 		econf_args+=(
-			--with-rootlibdir="${EPREFIX}"/$(get_libdir)
+			--with-rootlibdir="${EPREFIX}"/usr/$(get_libdir)
 			$(use_enable introspection)
 			$(use_enable kmod)
 			$(use_enable static-libs static)

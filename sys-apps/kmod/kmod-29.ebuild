@@ -88,7 +88,7 @@ src_configure() {
 		--bindir="${EPREFIX}/bin"
 		--enable-shared
 		--with-bashcompletiondir="$(get_bashcompdir)"
-		--with-rootlibdir="${EPREFIX}/$(get_libdir)"
+		--with-rootlibdir="${EPREFIX}/usr/$(get_libdir)"
 		$(use_enable debug)
 		$(usex doc '--enable-gtk-doc' '')
 		$(use_enable static-libs static)
