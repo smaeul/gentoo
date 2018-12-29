@@ -12,11 +12,15 @@ HOMEPAGE="https://git.kernel.org/cgit/devel/pahole/pahole.git/"
 LICENSE="GPL-2" # only
 SLOT="0"
 KEYWORDS="~amd64 ~x86"
-IUSE="debug"
+IUSE="debug elibc_musl"
 REQUIRED_USE="${PYTHON_REQUIRED_USE}"
 
 RDEPEND="${PYTHON_DEPS}
 	>=dev-libs/elfutils-0.131
+	elibc_musl? (
+		sys-libs/argp-standalone
+		sys-libs/obstack-standalone
+	)
 	sys-libs/zlib"
 DEPEND="${RDEPEND}"
 
