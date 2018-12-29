@@ -57,7 +57,7 @@ multilib_src_configure() {
 	#
 	#    We use /usr/$(get_libdir)/... to have ABI identifier.
 	ECONF_SOURCE="${S}" econf \
-		--includedir="${EPREFIX}"/usr/$(get_libdir)/${PN}/include \
+		--includedir="${EPREFIX}"/usr/$(get_libdir | sed s/lib/include/) \
 		--disable-multi-os-directory \
 		$(use_enable static-libs static) \
 		$(use_enable exec-static-trampoline exec-static-tramp) \

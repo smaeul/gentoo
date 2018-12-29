@@ -92,7 +92,7 @@ src_configure() {
 		--disable-Werror
 		--sysconfdir=/etc/nut
 		--with-dev
-		--with-drvpath="/$(get_libdir)/nut"
+		--with-drvpath="/usr/libexec/nut"
 		--with-group=nut
 		--with-htmlpath=/usr/share/nut/html
 		--with-logfacility=LOG_DAEMON

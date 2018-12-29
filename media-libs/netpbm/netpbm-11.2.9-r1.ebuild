@@ -246,7 +246,10 @@ src_install() {
 	emake -j1 package pkgdir="${ED}"/usr
 
 	if [[ $(get_libdir) != "lib" ]] ; then
-		mv "${ED}"/usr/lib "${ED}"/usr/$(get_libdir) || die
+		mv "${ED}"/usr/lib "${ED}"/usr/xyz || die
+		mkdir -p "${ED}"/usr/$(get_libdir) || die
+		rmdir "${ED}"/usr/$(get_libdir) || die
+		mv "${ED}"/usr/xyz "${ED}"/usr/$(get_libdir) || die
 	fi
 
 	# Remove cruft that we don't need, and move around stuff we want

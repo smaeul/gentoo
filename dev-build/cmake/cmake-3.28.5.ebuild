@@ -173,9 +173,10 @@ src_prepare() {
 
 	# Add gcc libs to the default link paths
 	sed -i \
-		-e "s|@GENTOO_PORTAGE_GCCLIBDIR@|${EPREFIX}/usr/${CHOST}/lib/|g" \
+		-e "s|@GENTOO_PORTAGE_GCCLIBDIR@|${EPREFIX}/usr/${CHOST}/lib|g" \
 		-e "$(usex prefix-guest "s|@GENTOO_HOST@||" "/@GENTOO_HOST@/d")" \
 		-e "s|@GENTOO_PORTAGE_EPREFIX@|${EPREFIX}/|g" \
+		-e "s|@GENTOO_PORTAGE_LIBDIR@|$(get_libdir)|g" \
 		Modules/Platform/{UnixPaths,Darwin}.cmake || die "sed failed"
 
 	## in theory we could handle these flags in src_configure, as we do in many other packages. But we *must*
