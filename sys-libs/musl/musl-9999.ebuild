@@ -199,5 +199,5 @@ pkg_postinst() {
 
 	[[ -n "${ROOT}" ]] && return 0
 
-	ldconfig || die
+	ldconfig -NX || die
 }
