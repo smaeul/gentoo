@@ -114,7 +114,7 @@ src_configure() {
 }
 
 src_test() {
-	emake check TESTSUITEFLAGS="--jobs=$(get_makeopts_jobs)"
+	emake F77=no check TESTSUITEFLAGS="--jobs=$(get_makeopts_jobs)"
 }
 
 src_install() {
