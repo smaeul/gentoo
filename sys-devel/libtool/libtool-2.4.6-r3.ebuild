@@ -81,7 +81,7 @@ src_configure() {
 }
 
 src_test() {
-	emake check
+	emake F77=no check
 }
 
 src_install() {
