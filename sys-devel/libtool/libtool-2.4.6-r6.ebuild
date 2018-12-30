@@ -105,6 +105,10 @@ src_configure() {
 	ECONF_SOURCE=${S} econf ${myconf} --disable-ltdl-install
 }
 
+src_test() {
+	emake F77=no check
+}
+
 src_install() {
 	default
 
