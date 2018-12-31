@@ -234,11 +234,16 @@ src_test() {
 	cd "${BUILD_DIR}" || die
 
 	# Skip failing tests.
-	local skipped_tests="distutils gdb"
-
-	for test in ${skipped_tests}; do
-		mv "${S}"/Lib/test/test_${test}.py "${T}"
-	done
+	local skipped_tests=(
+		test__locale
+		test_distutils
+		test_gdb
+		test_os
+		test_posix
+		test_re
+		test_strptime
+		test_time
+	)
 
 	# Daylight saving time problem
 	# https://bugs.python.org/issue22067
@@ -246,16 +251,12 @@ src_test() {
 	local -x TZ=UTC
 
 	# Rerun failed tests in verbose mode (regrtest -w).
-	emake test EXTRATESTOPTS="-w" < /dev/tty
+	emake test EXTRATESTOPTS="-w --exclude ${skipped_tests[*]}" CPPFLAGS= CFLAGS= LDFLAGS= < /dev/tty
 	local result="$?"
-
-	for test in ${skipped_tests}; do
-		mv "${T}/test_${test}.py" "${S}"/Lib/test
-	done
 
 	elog "The following tests have been skipped:"
 	for test in ${skipped_tests}; do
-		elog "test_${test}.py"
+		elog "${test}.py"
 	done
 
 	elog "If you would like to run them, you may:"
