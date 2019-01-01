@@ -163,7 +163,7 @@ src_test() {
 
 	addpredict /dev/ptmx
 	local i
-	for i in C02cond.ztst V08zpty.ztst X02zlevi.ztst Y01completion.ztst Y02compmatch.ztst Y03arguments.ztst ; do
+	for i in C02cond.ztst V08zpty.ztst X02zlevi.ztst Y01completion.ztst Y02compmatch.ztst Y03arguments.ztst A03quoting.ztst B03print.ztst D07multibyte.ztst V09datetime.ztst ; do
 		rm "${S}"/Test/${i} || die
 	done
 	emake check
