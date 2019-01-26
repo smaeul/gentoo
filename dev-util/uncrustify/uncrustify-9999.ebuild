@@ -16,7 +16,7 @@ fi
 
 inherit cmake-utils ${scm_eclass}
 
-PYTHON_COMPAT=( python2_7 )
+PYTHON_COMPAT=( python3_6 )
 
 inherit python-any-r1
 
