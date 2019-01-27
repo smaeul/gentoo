@@ -444,6 +444,7 @@ multilib_prepare_wrappers() {
 
 				# Some ABIs may have install less files than others.
 				if [[ -f ${root}/usr/include${f} ]]; then
+					local tuple=${CHOST/gentoo-/}
 					local wrapper=${ED%/}/tmp/multilib-include${f}
 
 					if [[ ! -f ${ED%/}/tmp/multilib-include${f} ]]; then
@@ -502,17 +503,16 @@ _EOF_
 						die "Flag ${MULTILIB_ABI_FLAG} not listed in wrapper template. Please report a bug to https://bugs.gentoo.org."
 					fi
 
-					# $CHOST shall be set by multilib_toolchain_setup
-					dodir "/tmp/multilib-include/${CHOST}${dir}"
-					mv "${root}/usr/include${f}" "${ED%/}/tmp/multilib-include/${CHOST}${dir}/" || die
+					dodir "/tmp/multilib-include/${tuple}${dir}"
+					mv "${root}/usr/include${f}" "${ED%/}/tmp/multilib-include/${tuple}${dir}/" || die
 
 					# Note: match a space afterwards to avoid collision potential.
-					sed -e "/${MULTILIB_ABI_FLAG} /s&error.*&include <${CHOST}${f}>&" \
+					sed -e "/${MULTILIB_ABI_FLAG} /s&error.*&include <${tuple}${f}>&" \
 						-i "${wrapper}" || die
 
 					# Needed for swig.
 					if multilib_is_native_abi; then
-						sed -e "/Native ABI/s&error.*&include <${CHOST}${f}>&" \
+						sed -e "/Native ABI/s&error.*&include <${tuple}${f}>&" \
 							-i "${wrapper}" || die
 					fi
 				fi
