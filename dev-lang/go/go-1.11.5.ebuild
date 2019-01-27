@@ -160,7 +160,7 @@ src_unpack()
 
 src_compile()
 {
-	export GOROOT_BOOTSTRAP="${WORKDIR}"/go-$(go_os)-$(go_arch)-bootstrap
+	export GOROOT_BOOTSTRAP=/usr/lib/go
 	if use gccgo; then
 		mkdir -p "${GOROOT_BOOTSTRAP}/bin" || die
 		local go_binary=$(gcc-config --get-bin-path)/go-$(gcc-major-version)
