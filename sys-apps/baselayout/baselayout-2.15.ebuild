@@ -66,7 +66,7 @@ multilib_layout() {
 						die "${dir} exists but is not a directory"
 					continue
 				fi
-				if ! use split-usr && [[ ${prefix} = ${EROOT}/ ]]; then
+				if ! true && [[ ${prefix} = ${EROOT}/ ]]; then
 					# for the special case of riscv multilib, we drop the
 					# second part of two-component libdirs, e.g. lib64/lp64
 					libdir="${libdir%%/*}"
@@ -101,7 +101,7 @@ multilib_layout() {
 	# figure out which paths should be symlinks and which should be directories
 	local dirs syms exp d
 	for libdir in ${libdirs} ; do
-		if use split-usr ; then
+		if true ; then
 			exp=( {,usr/,usr/local/}${libdir} )
 		else
 			exp=( {usr/,usr/local/}${libdir} )
@@ -127,7 +127,7 @@ multilib_layout() {
 
 	# setup symlinks and dirs where we expect them to be; do not migrate
 	# data ... just fall over in that case.
-	if use split-usr ; then
+	if true ; then
 		prefix_lst=( "${EROOT}"/{,usr/,usr/local/} )
 	else
 		prefix_lst=( "${EROOT}"/{usr/,usr/local/} )
@@ -189,7 +189,7 @@ multilib_layout() {
 			fi
 		fi
 	done
-	if ! use split-usr ; then
+	if ! true ; then
 		for libdir in ${libdirs}; do
 			if [[ ! -e "${EROOT}${libdir}" ]]; then
 				ln -s usr/"${libdir}" "${EROOT}${libdir}" ||
@@ -239,7 +239,7 @@ src_prepare() {
 	# path and the symlinked path doesn't change the resulting cache.
 	local libdir ldpaths
 	for libdir in $(get_all_libdirs) ; do
-		if use split-usr || use prefix-guest; then
+		if true || use prefix-guest; then
 			ldpaths+=":${EPREFIX}/${libdir}"
 		fi
 		ldpaths+=":${EPREFIX}/usr/${libdir}"
