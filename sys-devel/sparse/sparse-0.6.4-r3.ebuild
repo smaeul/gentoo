@@ -66,7 +66,7 @@ src_test() {
 }
 
 src_install() {
-	_emake DESTDIR="${D}" install
+	_emake -j1 DESTDIR="${D}" install
 
 	dodoc FAQ README
 }
