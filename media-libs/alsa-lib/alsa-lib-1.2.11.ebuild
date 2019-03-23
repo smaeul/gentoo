@@ -45,6 +45,10 @@ src_prepare() {
 	default
 
 	find . -name Makefile.am -exec sed -i -e '/CFLAGS/s:-g -O2::' {} + || die
+	# bug #509886
+	if use elibc_musl ; then
+		sed -i -e 's:oldapi queue_timer:queue_timer:' test/Makefile.am || die
+	fi
 	# bug #545950
 	sed -i -e '5s:^$:\nAM_CPPFLAGS = -I$(top_srcdir)/include:' test/lsb/Makefile.am || die
 
