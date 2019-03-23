@@ -13,7 +13,7 @@ LICENSE="GPL-2 MIT"
 SLOT="0"
 KEYWORDS="~amd64 ~arm ~arm64 ~ppc ~ppc64 ~riscv ~x86"
 IUSE="bmp fbcon truetype +gif +gtk gtk2 +javascript +jpeg mng
-	+png +psl rosprite +svg +svgtiny +webp"
+	+png +psl rosprite +svg +svgtiny test +webp"
 
 REQUIRED_USE="|| ( fbcon gtk gtk2 )"
 
@@ -53,6 +53,7 @@ BDEPEND="
 	dev-libs/check
 	dev-perl/HTML-Parser
 	>=dev-util/netsurf-buildsystem-1.7-r1
+	test? ( sys-apps/miscfiles )
 	virtual/pkgconfig
 "
 
