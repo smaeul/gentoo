@@ -144,7 +144,7 @@ if [[ ${PN} != "kgcc64" && ${PN} != gcc-* ]] ; then
 	if ! tc_version_is_at_least 10; then
 		IUSE+=" altivec"
 	fi
-	IUSE+=" debug +cxx +nptl" TC_FEATURES+=(nptl)
+	IUSE+=" ada debug +cxx +nptl" TC_FEATURES+=(nptl)
 	[[ -n ${PIE_VER} ]] && IUSE+=" nopie"
 	[[ -n ${SPECS_VER} ]] && IUSE+=" nossp"
 	# fortran support appeared in 4.1, but 4.1 needs outdated mpfr
@@ -2014,6 +2014,7 @@ create_gcc_env_entry() {
 			mdir=$($(XGCC) $(get_abi_CFLAGS ${abi}) --print-multi-directory)
 			ldpath=${LIBPATH}
 			[[ ${mdir} != "." ]] && ldpath+="/${mdir}"
+			is_ada && ldpath+=":${ldpath}/adalib"
 			ldpaths="${ldpath}${ldpaths:+:${ldpaths}}"
 
 			mosdir=$($(XGCC) $(get_abi_CFLAGS ${abi}) -print-multi-os-directory)
