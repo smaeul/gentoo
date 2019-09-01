@@ -668,7 +668,7 @@ make_gcc_hard() {
 # while people are transitioning from the old style to the new style,
 # we always set the MULTILIB_OSDIRNAMES var for relevant targets.
 setup_multilib_osdirnames() {
-	is_multilib || return 0
+	return 0
 
 	local config
 	local libdirs="../lib64 ../lib32"
@@ -1094,7 +1094,6 @@ toolchain_src_configure() {
 	# be small, and should simplify building of 64bit kernels in a 32bit
 	# userland by not needing sys-devel/kgcc64.  #349405
 	case $(tc-arch) in
-	ppc|ppc64) tc_version_is_at_least 3.4 && confgcc+=( --enable-targets=all ) ;;
 	sparc)     tc_version_is_at_least 4.4 && confgcc+=( --enable-targets=all ) ;;
 	amd64|x86) tc_version_is_at_least 4.3 && confgcc+=( --enable-targets=all ) ;;
 	esac
@@ -2013,7 +2012,7 @@ create_gcc_env_entry() {
 		for abi in $(get_all_abis TARGET) ; do
 			mdir=$($(XGCC) $(get_abi_CFLAGS ${abi}) --print-multi-directory)
 			ldpath=${LIBPATH}
-			[[ ${mdir} != "." ]] && ldpath+="/${mdir}"
+			[[ ${mdir} != "." ]] && continue
 			is_ada && ldpath+=":${ldpath}/adalib"
 			ldpaths="${ldpath}${ldpaths:+:${ldpaths}}"
 
