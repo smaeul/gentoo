@@ -198,7 +198,7 @@ tc_has_feature() {
 }
 
 if [[ ${PN} != kgcc64 && ${PN} != gcc-* ]] ; then
-	IUSE+=" debug +cxx +nptl" TC_FEATURES+=( nptl )
+	IUSE+=" ada debug +cxx +nptl" TC_FEATURES+=( nptl )
 	[[ -n ${PIE_VER} ]] && IUSE+=" nopie"
 	[[ -n ${SPECS_VER} ]] && IUSE+=" nossp"
 	IUSE+=" +fortran" TC_FEATURES+=( fortran )
@@ -2250,6 +2250,7 @@ create_gcc_env_entry() {
 		mdir=$($(XGCC) $(get_abi_CFLAGS ${abi}) --print-multi-directory)
 		ldpath=${LIBPATH}
 		[[ ${mdir} != "." ]] && ldpath+="/${mdir}"
+		is_ada && ldpath+=":${ldpath}/adalib"
 		ldpaths="${ldpath}${ldpaths:+:${ldpaths}}"
 
 		mosdir=$($(XGCC) $(get_abi_CFLAGS ${abi}) -print-multi-os-directory)
