@@ -106,13 +106,13 @@ src_install() {
 	fperms 700 /var/spool/nullmailer/service/log/run
 
 	# usability
-	dosym ../sbin/sendmail usr/$(get_libdir)/sendmail
+	dosym ../bin/sendmail usr/$(get_libdir)/sendmail
 
 	# permissions stuff
 	keepdir /var/log/nullmailer /var/spool/nullmailer/{tmp,queue,failed}
 	fperms 770 /var/log/nullmailer
-	fowners nullmail:nullmail /usr/sbin/nullmailer-queue /usr/bin/mailq
-	fperms 4711 /usr/sbin/nullmailer-queue /usr/bin/mailq
+	fowners nullmail:nullmail /usr/bin/nullmailer-queue /usr/bin/mailq
+	fperms 4711 /usr/bin/nullmailer-queue /usr/bin/mailq
 
 	newinitd "${FILESDIR}"/init.d-nullmailer-r6 nullmailer
 	systemd_dounit scripts/${PN}.service
