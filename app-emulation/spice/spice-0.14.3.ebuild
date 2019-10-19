@@ -13,7 +13,7 @@ SRC_URI="https://www.spice-space.org/download/releases/spice-server/${P}.tar.bz2
 LICENSE="LGPL-2.1"
 SLOT="0"
 KEYWORDS="amd64 arm64 ppc64 x86"
-IUSE="lz4 sasl smartcard static-libs gstreamer"
+IUSE="lz4 sasl smartcard static-libs test gstreamer"
 
 # the libspice-server only uses the headers of libcacard
 RDEPEND="
@@ -33,7 +33,8 @@ RDEPEND="
 	)"
 DEPEND="${RDEPEND}
 	>=app-emulation/spice-protocol-0.14.0
-	smartcard? ( app-emulation/qemu[smartcard] )"
+	smartcard? ( app-emulation/qemu[smartcard] )
+	test? ( net-libs/glib-networking )"
 BDEPEND="${PYTHON_DEPS}
 	virtual/pkgconfig
 	$(python_gen_any_dep '
