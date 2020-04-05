@@ -16,7 +16,6 @@ SLOT="0"
 KEYWORDS="amd64 ~loong ~riscv x86"
 
 RDEPEND=">=dev-libs/bglibs-2.04
-	sys-apps/ucspi-unix
 	sys-process/cronbase
 	virtual/daemontools
 	virtual/mta"
