@@ -3,6 +3,8 @@
 
 EAPI=7
 
+inherit toolchain-funcs
+
 DESCRIPTION="A non-interactive scripting language"
 HOMEPAGE="https://www.skarnet.org/software/execline/"
 SRC_URI="https://www.skarnet.org/software/${PN}/${P}.tar.gz"
@@ -39,4 +41,8 @@ src_configure() {
 		$(use_enable static allstatic) \
 		$(use_enable static static-libc) \
 		$(use_enable static-libs static)
+}
+
+src_compile() {
+	emake AR="$(tc-getAR)" RANLIB="$(tc-getRANLIB)"
 }
