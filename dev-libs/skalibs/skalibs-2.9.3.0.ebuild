@@ -3,6 +3,8 @@
 
 EAPI=7
 
+inherit toolchain-funcs
+
 DESCRIPTION="General-purpose libraries from skarnet.org"
 HOMEPAGE="https://www.skarnet.org/software/skalibs/"
 SRC_URI="https://www.skarnet.org/software/${PN}/${P}.tar.gz"
@@ -32,4 +34,8 @@ src_configure() {
 		--enable-shared \
 		$(use_enable static-libs static) \
 		$(use_enable ipv6)
+}
+
+src_compile() {
+	emake AR="$(tc-getAR)" RANLIB="$(tc-getRANLIB)"
 }
