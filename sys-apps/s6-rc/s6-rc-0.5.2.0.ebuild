@@ -3,6 +3,8 @@
 
 EAPI=7
 
+inherit toolchain-funcs
+
 DESCRIPTION="Service manager for the s6 supervision suite"
 HOMEPAGE="https://www.skarnet.org/software/s6-rc/"
 SRC_URI="https://www.skarnet.org/software/${PN}/${P}.tar.gz"
@@ -44,6 +46,10 @@ src_configure() {
 		$(use_enable static allstatic) \
 		$(use_enable static static-libc) \
 		$(use_enable static-libs static)
+}
+
+src_compile() {
+	emake AR="$(tc-getAR)" RANLIB="$(tc-getRANLIB)"
 }
 
 pkg_postinst() {
