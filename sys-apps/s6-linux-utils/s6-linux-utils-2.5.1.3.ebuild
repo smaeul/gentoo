@@ -3,6 +3,8 @@
 
 EAPI=7
 
+inherit toolchain-funcs
+
 DESCRIPTION="Set of tiny linux utilities"
 HOMEPAGE="https://www.skarnet.org/software/s6-linux-utils/"
 SRC_URI="https://www.skarnet.org/software/${PN}/${P}.tar.gz"
@@ -37,4 +39,8 @@ src_configure() {
 		--with-sysdeps=/usr/$(get_libdir)/skalibs \
 		$(use_enable static allstatic) \
 		$(use_enable static static-libc)
+}
+
+src_compile() {
+	emake AR="$(tc-getAR)" RANLIB="$(tc-getRANLIB)"
 }
