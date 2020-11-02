@@ -46,6 +46,7 @@ src_compile() {
 }
 
 src_install() {
+	unset LIBDIR
 	emake install \
 		DESTDIR="${D}" \
 		PREFIX="${EPREFIX}/usr" \
