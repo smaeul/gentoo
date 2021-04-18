@@ -20,7 +20,7 @@ BDEPEND="nls? ( sys-devel/gettext )"
 
 src_prepare() {
 	default
-	sed -i -e 's:lt-test1:test1:' tests/testit.sh || die
+	use arm64 || sed -i -e 's:lt-test1:test1:' tests/testit.sh || die
 	elibtoolize
 }
 
