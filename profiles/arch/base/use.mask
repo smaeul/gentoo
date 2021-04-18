@@ -70,6 +70,10 @@ cpu_flags_x86_xop
 # ppc arch specific USE flags
 altivec
 ppcsha1
+cpu_flags_ppc_altivec
+cpu_flags_ppc_vsx
+cpu_flags_ppc_vsx2
+cpu_flags_ppc_vsx3
 
 # mips arch specific USE flags
 fixed-point
