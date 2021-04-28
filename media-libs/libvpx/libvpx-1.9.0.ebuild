@@ -79,10 +79,10 @@ multilib_src_configure() {
 	case "${CHOST}" in
 		i?86*) export AS=yasm;;
 		x86_64*) export AS=yasm;;
+		# powerpc toolchain is not recognized anymore, #694368
+		# apply same workaround for ppc64, but not for ppc64le
+		powerpc-*|powerpc64-*) myconfargs+=( --force-target=generic-gnu );;
 	esac
-
-	# powerpc toolchain is not recognized anymore, #694368
-	[[ ${CHOST} == powerpc-* ]] && myconfargs+=( --force-target=generic-gnu )
 
 	# Build with correct toolchain.
 	tc-export CC CXX AR NM
