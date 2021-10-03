@@ -131,11 +131,16 @@ src_install() {
 	emake DESTDIR="${D}" ${target}
 	just_headers && return 0
 
-	# musl provides ldd via a sym link to its ld.so
 	local sysroot=
 	target_is_not_host && sysroot=/usr/${CTARGET}
 	local ldso=$(basename "${ED}${sysroot}"/lib/ld-musl-*)
-	dosym -r "${sysroot}/lib/${ldso}" "${sysroot}/usr/bin/ldd"
+	cat > ${T}/${CTARGET}-ldd <<- EOF
+	#!/bin/sh
+	exec ${EPREFIX}${sysroot}/lib/${ldso} --list -- "\$@"
+	EOF
+	into ${sysroot}/usr
+	dobin ${T}/${CTARGET}-ldd
+	dosym ${CTARGET}-ldd ${sysroot}/usr/bin/ldd
 
 	if ! use crypt ; then
 		# Allow sys-libs/libxcrypt[system] to provide it instead
