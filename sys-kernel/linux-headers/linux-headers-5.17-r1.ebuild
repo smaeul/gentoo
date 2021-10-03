@@ -49,10 +49,6 @@ src_prepare() {
 	default
 }
 
-src_test() {
-	emake headers_check ${xmakeopts}
-}
-
 src_install() {
 	kernel-2_src_install
 
