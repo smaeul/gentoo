@@ -37,6 +37,9 @@ PATCHES=(
 
 src_prepare() {
 	default
+
+	(cd .. && eapply "${FILESDIR}/lua-5.3.6-locale.patch")
+
 	# use glibtool on Darwin (versus Apple libtool)
 	if [[ ${CHOST} == *-darwin* ]] ; then
 		sed -i -e '/LIBTOOL = /s:/libtool:/glibtool:' \
