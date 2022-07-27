@@ -425,6 +425,7 @@ pkg_preinst() {
 		# Make giomodule.cache belong to glib alone
 		local cache="/usr/$(get_libdir)/gio/modules/giomodule.cache"
 
+		mkdir -p "${ED}"$(dirname ${cache}) || die
 		if [[ -e ${EROOT}${cache} ]]; then
 			cp "${EROOT}"${cache} "${ED}"${cache} || die
 		else
