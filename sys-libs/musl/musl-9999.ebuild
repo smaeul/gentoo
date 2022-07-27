@@ -102,6 +102,7 @@ src_configure() {
 	./configure \
 		--target=${CTARGET} \
 		--prefix="${EPREFIX}${sysroot}/usr" \
+		--libdir="${EPREFIX}${sysroot}/usr/$(get_libdir)" \
 		--syslibdir="${EPREFIX}${sysroot}/lib" \
 		--disable-gcc-wrapper || die
 }
@@ -156,11 +157,11 @@ src_install() {
 		# ${D} instead.
 		rm "${ED}"/lib/ld-musl-${arch}.so.1 || die
 		if use split-usr; then
-			dosym ../usr/lib/libc.so /lib/ld-musl-${arch}.so.1
+			dosym ../usr/$(get_libdir)/libc.so /lib/ld-musl-${arch}.so.1
 			# If it's still a dead symlink, OK, we really do need to abort.
 			[[ -e "${ED}"/lib/ld-musl-${arch}.so.1 ]] || die
 		else
-			dosym libc.so /usr/lib/ld-musl-${arch}.so.1
+			dosym ../$(get_libdir)/libc.so /usr/lib/ld-musl-${arch}.so.1
 			[[ -e "${ED}"/usr/lib/ld-musl-${arch}.so.1 ]] || die
 		fi
 
