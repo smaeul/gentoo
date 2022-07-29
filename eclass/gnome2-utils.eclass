@@ -349,7 +349,7 @@ gnome2_schemas_update() {
 # This function should be called from pkg_preinst.
 gnome2_gdk_pixbuf_savelist() {
 	pushd "${ED}" > /dev/null || die
-	export GNOME2_ECLASS_GDK_PIXBUF_LOADERS=$(find usr/lib*/gdk-pixbuf-2.0 -type f 2>/dev/null)
+	export GNOME2_ECLASS_GDK_PIXBUF_LOADERS=$(find usr/lib/*/gdk-pixbuf-2.0 -type f 2>/dev/null)
 	popd > /dev/null || die
 }
 
