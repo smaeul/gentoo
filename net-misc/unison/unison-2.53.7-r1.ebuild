@@ -41,10 +41,6 @@ RDEPEND="
 	>=dev-lang/ocaml-4.08:=
 	gui? (
 		dev-ml/lablgtk:3=[ocamlopt?]
-		|| (
-			net-misc/ssh-askpass-fullscreen
-			net-misc/x11-ssh-askpass
-		)
 	)
 "
 IDEPEND="
