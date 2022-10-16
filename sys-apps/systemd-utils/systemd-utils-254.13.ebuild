@@ -464,7 +464,7 @@ multilib_src_install() {
 		if use udev; then
 			into "${rootprefix:-/}"
 			dobin udevadm systemd-hwdb
-			dosym ../../bin/udevadm "${rootprefix}"/lib/systemd/systemd-udevd
+			dosym ../../bin/udevadm "${rootprefix}"/bin/udevd
 
 			exeinto "${rootprefix}"/lib/udev
 			doexe src/udev/{ata_id,cdrom_id,fido_id,mtd_probe,scsi_id,v4l_id}
@@ -480,7 +480,7 @@ multilib_src_install() {
 			doins src/udev/udev.pc
 
 			doman man/{udev.conf.5,systemd.link.5,hwdb.7,systemd-hwdb.8,udev.7,udevadm.8}
-			newman man/systemd-udevd.service.8 systemd-udevd.8
+			newman man/systemd-udevd.service.8 udevd.8
 			doman man/libudev.3
 			doman man/udev_*.3
 		fi
