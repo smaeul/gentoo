@@ -76,6 +76,7 @@ src_configure() {
 
 src_test() {
 	cd "${BUILD_DIR}"/src/tests || die
+	addpredict /dev/urandom # Botan::system_rng()
 	ctest -j$(makeopts_jobs) -R .* --output-on-failure || die
 }
 
