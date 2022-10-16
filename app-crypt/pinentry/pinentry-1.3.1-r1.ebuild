@@ -14,13 +14,14 @@ SRC_URI+=" verify-sig? ( mirror://gnupg/${PN}/${P}.tar.bz2.sig )"
 LICENSE="GPL-2"
 SLOT="0"
 KEYWORDS="~alpha amd64 arm arm64 ~hppa ~loong ~m68k ~mips ppc ppc64 ~riscv ~s390 ~sparc x86 ~amd64-linux ~x86-linux ~arm64-macos ~ppc-macos ~x64-macos ~x64-solaris"
-IUSE="caps efl emacs gtk keyring ncurses qt6 wayland X"
+IUSE="caps efl emacs gtk gtk2 keyring ncurses qt6 wayland X"
 
 DEPEND="
 	>=dev-libs/libassuan-2.1:=
 	>=dev-libs/libgcrypt-1.6.3
 	>=dev-libs/libgpg-error-1.17
 	efl? ( dev-libs/efl[X] )
+	gtk2? ( x11-libs/gtk+:2 )
 	keyring? ( app-crypt/libsecret )
 	ncurses? ( sys-libs/ncurses:= )
 	qt6? (
@@ -64,6 +65,7 @@ src_configure() {
 		$(use_enable emacs pinentry-emacs)
 		$(use_enable keyring libsecret)
 		$(use_enable gtk pinentry-gnome3)
+		$(use_enable gtk2 pinentry-gtk2)
 		$(use_enable ncurses fallback-curses)
 		$(use_enable ncurses pinentry-curses)
 		$(use_enable qt6 pinentry-qt)
@@ -72,7 +74,6 @@ src_configure() {
 		--enable-pinentry-tty
 		--disable-kf5-wayland
 		--disable-pinentry-fltk
-		--disable-pinentry-gtk2
 		--disable-pinentry-qt5
 		--disable-qtx11extras
 
