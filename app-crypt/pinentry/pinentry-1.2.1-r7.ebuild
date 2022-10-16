@@ -14,7 +14,7 @@ SRC_URI+=" verify-sig? ( mirror://gnupg/${PN}/${P}.tar.bz2.sig )"
 LICENSE="GPL-2"
 SLOT="0"
 KEYWORDS="~alpha amd64 arm arm64 hppa ~ia64 ~loong ~m68k ~mips ppc ppc64 ~riscv ~s390 sparc x86 ~amd64-linux ~x86-linux ~arm64-macos ~ppc-macos ~x64-macos ~x64-solaris"
-IUSE="caps efl emacs gtk keyring ncurses qt5 wayland X"
+IUSE="caps efl emacs gtk gtk2 keyring ncurses qt5 wayland X"
 
 DEPEND="
 	>=dev-libs/libassuan-2.1:=
@@ -37,6 +37,7 @@ DEPEND="
 RDEPEND="
 	${DEPEND}
 	gtk? ( app-crypt/gcr:0[gtk] )
+	gtk2? ( x11-libs/gtk+:2 )
 "
 BDEPEND="
 	sys-devel/gettext
@@ -73,6 +74,7 @@ src_configure() {
 		$(use_enable emacs pinentry-emacs)
 		$(use_enable keyring libsecret)
 		$(use_enable gtk pinentry-gnome3)
+		$(use_enable gtk2 pinentry-gtk2)
 		$(use_enable ncurses fallback-curses)
 		$(use_enable ncurses pinentry-curses)
 		$(use_enable qt5 pinentry-qt)
@@ -82,7 +84,6 @@ src_configure() {
 
 		--enable-pinentry-tty
 		--disable-pinentry-fltk
-		--disable-pinentry-gtk2
 
 		MOC="$(qt5_get_bindir)"/moc
 		GPG_ERROR_CONFIG="${ESYSROOT}"/usr/bin/${CHOST}-gpg-error-config
