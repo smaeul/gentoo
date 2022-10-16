@@ -488,7 +488,7 @@ multilib_src_install() {
 		if use udev; then
 			set_rpath udevadm systemd-hwdb
 			dobin udevadm systemd-hwdb
-			dosym ../../bin/udevadm /usr/lib/systemd/systemd-udevd
+			dosym udevadm /bin/udevd
 			if use split-usr; then
 				# elogind installs udev rules that hard-code /bin/udevadm
 				dosym ../usr/bin/udevadm /bin/udevadm
@@ -514,7 +514,7 @@ multilib_src_install() {
 			doins src/udev/udev.pc
 
 			doman man/{udev.conf.5,systemd.link.5,hwdb.7,systemd-hwdb.8,udev.7,udevadm.8}
-			newman man/systemd-udevd.service.8 systemd-udevd.8
+			newman man/systemd-udevd.service.8 udevd.8
 			doman man/libudev.3
 			doman man/udev_*.3
 		fi
