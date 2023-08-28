@@ -146,7 +146,7 @@ src_unpack() {
 	# We expect the tar implementation to support the -j option (both
 	# GNU tar and libarchive's tar support that).
 	echo ">>> Unpacking ${LINUX_SOURCES} (${paths[*]}) to ${PWD}"
-	gtar --wildcards -xpf "${DISTDIR}"/${LINUX_SOURCES} \
+	tar -xpf "${DISTDIR}"/${LINUX_SOURCES} \
 		"${paths[@]/#/linux-${LINUX_VER}/}" || die
 
 	if [[ -n ${LINUX_PATCH} ]] ; then
