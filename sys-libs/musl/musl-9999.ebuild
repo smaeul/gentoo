@@ -161,7 +161,7 @@ src_install() {
 		# using musl so that file may not exist. Use a relative symlink within
 		# ${D} instead.
 		rm "${ED}"/lib/ld-musl-${arch}.so.1 || die
-		if use split-usr; then
+		if true; then
 			dosym ../usr/$(get_libdir)/libc.so /lib/ld-musl-${arch}.so.1
 			# If it's still a dead symlink, OK, we really do need to abort.
 			[[ -e "${ED}"/lib/ld-musl-${arch}.so.1 ]] || die
