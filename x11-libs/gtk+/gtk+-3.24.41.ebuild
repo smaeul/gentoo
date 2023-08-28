@@ -74,7 +74,6 @@ BDEPEND="
 	app-text/docbook-xsl-stylesheets
 	dev-libs/gobject-introspection-common
 	dev-libs/libxslt
-	>=dev-util/gdbus-codegen-2.48
 	dev-util/glib-utils
 	>=dev-build/gtk-doc-am-1.20
 	wayland? ( dev-util/wayland-scanner )
