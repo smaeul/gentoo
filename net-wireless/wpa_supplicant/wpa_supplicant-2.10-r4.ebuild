@@ -128,6 +128,8 @@ src_prepare() {
 
 	# bug (640492)
 	sed -i 's#-Werror ##' wpa_supplicant/Makefile || die
+
+	eapply "${FILESDIR}/566ce69a8d0e64093309cbde80235aa522fbf84e.patch"
 }
 
 src_configure() {
