@@ -146,8 +146,8 @@ src_configure() {
 		)
 		local texec
 		for texec in check dump repair restore; do
-			myeconfargs+=( --with-thin-${texec}="${EPREFIX}"/usr/sbin/thin_${texec} )
-			myeconfargs+=( --with-cache-${texec}="${EPREFIX}"/usr/sbin/cache_${texec} )
+			myeconfargs+=( --with-thin-${texec}="${EPREFIX}"/usr/bin/thin_${texec} )
+			myeconfargs+=( --with-cache-${texec}="${EPREFIX}"/usr/bin/cache_${texec} )
 		done
 	else
 		myeconfargs+=( --with-thin=none --with-cache=none )
@@ -161,10 +161,9 @@ src_configure() {
 		$(use_enable selinux)
 		--enable-pkgconfig
 		--with-confdir="${EPREFIX}"/etc
-		--exec-prefix="${EPREFIX}"
-		--sbindir="${EPREFIX}/sbin"
-		--with-staticdir="${EPREFIX}"/sbin
-		--libdir="${EPREFIX}/$(get_libdir)"
+		--sbindir="${EPREFIX}/usr/bin"
+		--with-staticdir="${EPREFIX}"/usr/bin
+		--libdir="${EPREFIX}/usr/$(get_libdir)"
 		--with-usrlibdir="${EPREFIX}/usr/$(get_libdir)"
 		--with-default-dm-run-dir=/run
 		--with-default-run-dir=/run/lvm
