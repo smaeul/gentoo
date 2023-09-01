@@ -675,6 +675,7 @@ src_prepare() {
 
 	# Clear checksums from cargo crates we've manually patched.
 	# moz_clear_vendor_checksums xyz
+	moz_clear_vendor_checksums nix
 	moz_clear_vendor_checksums proc-macro2
 
 	# Respect choice for "jumbo-build"
