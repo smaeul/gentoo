@@ -1,0 +1,11 @@
+--- a/vendor/getrandom-0.2.8/src/util_libc.rs
++++ b/vendor/getrandom-0.2.8/src/util_libc.rs
+@@ -97,7 +97,7 @@ pub fn ptr(&self) -> Option<NonNull<libc::c_void>> {
+ }
+ 
+ cfg_if! {
+-    if #[cfg(any(target_os = "linux", target_os = "emscripten"))] {
++    if #[cfg(target_os = "emscripten")] {
+         use libc::open64 as open;
+     } else {
+         use libc::open;
