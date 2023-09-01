@@ -37,6 +37,7 @@ BDEPEND+="
 "
 COMMON_DEPEND="
 	dev-libs/openssl:0=
+	dev-libs/pkcs11-helper:0=
 	sys-libs/zlib:0
 	aad? ( dev-libs/cJSON )
 	alsa? ( media-libs/alsa-lib )
