@@ -596,6 +596,7 @@ src_prepare() {
 
 	# Clear checksums from cargo crates we've manually patched.
 	# moz_clear_vendor_checksums xyz
+	moz_clear_vendor_checksums nix
 
 	# Create build dir
 	BUILD_DIR="${WORKDIR}/${PN}_build"
