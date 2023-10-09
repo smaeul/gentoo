@@ -690,6 +690,7 @@ src_prepare() {
 	moz_clear_vendor_checksums encoding_rs
 	moz_clear_vendor_checksums any_all_workaround
 	moz_clear_vendor_checksums packed_simd
+	moz_clear_vendor_checksums nix
 
 	# Create build dir
 	BUILD_DIR="${WORKDIR}/${PN}_build"
