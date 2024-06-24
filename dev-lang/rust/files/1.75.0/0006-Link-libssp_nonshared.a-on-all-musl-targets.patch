@@ -1,0 +1,31 @@
+From f516ef748075ddfbcbaec493e1a7ee1e59538bd0 Mon Sep 17 00:00:00 2001
+From: Samuel Holland <samuel@sholland.org>
+Date: Sun, 3 Nov 2019 17:01:32 -0600
+Subject: [PATCH 06/12] Link libssp_nonshared.a on all musl targets
+
+---
+ compiler/rustc_target/src/spec/base/linux_musl.rs | 5 ++++-
+ 1 file changed, 4 insertions(+), 1 deletion(-)
+
+diff --git a/compiler/rustc_target/src/spec/base/linux_musl.rs b/compiler/rustc_target/src/spec/base/linux_musl.rs
+index 36d64059d59..c113af24644 100644
+--- a/compiler/rustc_target/src/spec/base/linux_musl.rs
++++ b/compiler/rustc_target/src/spec/base/linux_musl.rs
+@@ -1,10 +1,13 @@
+-use crate::spec::{base, TargetOptions};
++use crate::spec::{base, Cc, LinkerFlavor, Lld, TargetOptions};
+ 
+ pub fn opts() -> TargetOptions {
+     let mut base = base::linux::opts();
+ 
+     base.env = "musl".into();
+ 
++    // libssp_nonshared.a is needed for __stack_chk_fail_local when using libc.so
++    base.add_post_link_args(LinkerFlavor::Gnu(Cc::Yes, Lld::No), &["-lssp_nonshared"]);
++
+     // These targets statically link libc by default
+     base.crt_static_default = true;
+ 
+-- 
+2.44.2
+

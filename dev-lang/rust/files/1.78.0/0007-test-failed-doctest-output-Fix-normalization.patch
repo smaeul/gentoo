@@ -1,0 +1,36 @@
+From 5ecc3bac493f2df5b76f42cff6ea602d1624d323 Mon Sep 17 00:00:00 2001
+From: Samuel Holland <samuel@sholland.org>
+Date: Mon, 7 Oct 2019 18:36:28 -0500
+Subject: [PATCH 07/12] test/failed-doctest-output: Fix normalization
+
+Otherwise we get:
+
+1
+2       running 2 tests
+-       test $DIR/failed-doctest-output.rs - OtherStruct (line 20) ... FAILED
+-       test $DIR/failed-doctest-output.rs - SomeStruct (line 10) ... FAILED
++       test src/rustc-1.38.0-src/$DIR/failed-doctest-output.rs - OtherStruct (line 20) ... FAILED
++       test src/rustc-1.38.0-src/$DIR/failed-doctest-output.rs - SomeStruct (line 10) ... FAILED
+5
+6       failures:
+7
+---
+ tests/rustdoc-ui/doctest/failed-doctest-output.rs | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/tests/rustdoc-ui/doctest/failed-doctest-output.rs b/tests/rustdoc-ui/doctest/failed-doctest-output.rs
+index d4d49b73793..9c44f7ce232 100644
+--- a/tests/rustdoc-ui/doctest/failed-doctest-output.rs
++++ b/tests/rustdoc-ui/doctest/failed-doctest-output.rs
+@@ -7,7 +7,7 @@
+ 
+ //@ compile-flags:--test --test-args --test-threads=1
+ //@ rustc-env:RUST_BACKTRACE=0
+-//@ normalize-stdout-test: "tests/rustdoc-ui/doctest" -> "$$DIR"
++//@ normalize-stdout-test: "[[:graph:]]*tests/rustdoc-ui/doctest" -> "$$DIR"
+ //@ normalize-stdout-test "finished in \d+\.\d+s" -> "finished in $$TIME"
+ //@ failure-status: 101
+ 
+-- 
+2.44.2
+

@@ -1,0 +1,37 @@
+From 9357baa3eede8062b7c17407d23c3d2102af8435 Mon Sep 17 00:00:00 2001
+From: Samuel Holland <samuel@sholland.org>
+Date: Wed, 10 Jan 2018 13:36:41 -0600
+Subject: [PATCH 02/12] Fix linking to zlib when cross-compiling
+
+---
+ compiler/rustc_llvm/build.rs | 7 ++-----
+ 1 file changed, 2 insertions(+), 5 deletions(-)
+
+diff --git a/compiler/rustc_llvm/build.rs b/compiler/rustc_llvm/build.rs
+index 4b0c1229da1..2d61b834c78 100644
+--- a/compiler/rustc_llvm/build.rs
++++ b/compiler/rustc_llvm/build.rs
+@@ -237,10 +237,8 @@ fn main() {
+     // of llvm-config, not the target that we're attempting to link.
+     let mut cmd = Command::new(&llvm_config);
+     cmd.arg(llvm_link_arg).arg("--libs");
+-
+-    if !is_crossed {
+-        cmd.arg("--system-libs");
+-    }
++    cmd.arg("--system-libs");
++    cmd.args(&components);
+ 
+     // We need libkstat for getHostCPUName on SPARC builds.
+     // See also: https://github.com/llvm/llvm-project/issues/64186
+@@ -273,7 +271,6 @@ fn main() {
+         println!("cargo:rustc-link-lib=z");
+         println!("cargo:rustc-link-lib=execinfo");
+     }
+-    cmd.args(&components);
+ 
+     for lib in output(&mut cmd).split_whitespace() {
+         let name = if let Some(stripped) = lib.strip_prefix("-l") {
+-- 
+2.44.2
+

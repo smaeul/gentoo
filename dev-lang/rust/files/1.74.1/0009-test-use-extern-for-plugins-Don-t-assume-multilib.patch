@@ -1,0 +1,30 @@
+From b130d26185f266e3e442e3d05755a60d8494367d Mon Sep 17 00:00:00 2001
+From: Samuel Holland <samuel@sholland.org>
+Date: Sat, 6 Oct 2018 04:01:48 +0000
+Subject: [PATCH 09/14] test/use-extern-for-plugins: Don't assume multilib
+
+---
+ tests/run-make/use-extern-for-plugins/Makefile | 7 +------
+ 1 file changed, 1 insertion(+), 6 deletions(-)
+
+diff --git a/tests/run-make/use-extern-for-plugins/Makefile b/tests/run-make/use-extern-for-plugins/Makefile
+index b8ec7e8dcda..be452b56003 100644
+--- a/tests/run-make/use-extern-for-plugins/Makefile
++++ b/tests/run-make/use-extern-for-plugins/Makefile
+@@ -4,12 +4,7 @@ include ../tools.mk
+ # ignore-openbsd
+ # ignore-solaris
+ 
+-HOST := $(shell $(RUSTC) -vV | grep 'host:' | sed 's/host: //')
+-ifeq ($(findstring i686,$(HOST)),i686)
+-TARGET := $(subst i686,x86_64,$(HOST))
+-else
+-TARGET := $(subst x86_64,i686,$(HOST))
+-endif
++TARGET := $(shell $(RUSTC) -vV | grep 'host:' | sed 's/host: //')
+ 
+ all:
+ 	$(RUSTC) foo.rs -C extra-filename=-host
+-- 
+2.44.2
+

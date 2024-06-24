@@ -1,0 +1,520 @@
+From 2832415be9db86092593c929faf1df46852402c1 Mon Sep 17 00:00:00 2001
+From: Samuel Holland <samuel@sholland.org>
+Date: Fri, 8 Sep 2017 22:11:14 -0500
+Subject: [PATCH 04/12] Remove musl_root and CRT fallback from musl targets
+
+---
+ compiler/rustc_codegen_ssa/src/back/link.rs   |  6 +--
+ .../rustc_target/src/spec/base/linux_musl.rs  |  6 +--
+ compiler/rustc_target/src/spec/crt_objects.rs | 22 ----------
+ compiler/rustc_target/src/spec/mod.rs         |  5 ---
+ config.example.toml                           | 17 --------
+ src/bootstrap/configure.py                    | 32 --------------
+ src/bootstrap/src/core/build_steps/compile.rs | 42 +------------------
+ src/bootstrap/src/core/config/config.rs       | 10 -----
+ src/bootstrap/src/core/sanity.rs              | 23 ----------
+ src/bootstrap/src/lib.rs                      | 19 ---------
+ src/bootstrap/src/utils/cc_detect.rs          | 26 ------------
+ .../host-x86_64/dist-arm-linux/Dockerfile     |  1 -
+ .../dist-i586-gnu-i586-i686-musl/Dockerfile   |  2 -
+ .../host-x86_64/dist-various-1/Dockerfile     |  4 --
+ .../host-x86_64/dist-various-2/Dockerfile     |  3 +-
+ .../host-x86_64/dist-x86_64-musl/Dockerfile   |  1 -
+ .../host-x86_64/test-various/Dockerfile       |  1 -
+ 17 files changed, 4 insertions(+), 216 deletions(-)
+
+diff --git a/compiler/rustc_codegen_ssa/src/back/link.rs b/compiler/rustc_codegen_ssa/src/back/link.rs
+index dd9d277fb77..85044059792 100644
+--- a/compiler/rustc_codegen_ssa/src/back/link.rs
++++ b/compiler/rustc_codegen_ssa/src/back/link.rs
+@@ -1708,7 +1708,7 @@ fn detect_self_contained_mingw(sess: &Session) -> bool {
+ /// Various toolchain components used during linking are used from rustc distribution
+ /// instead of being found somewhere on the host system.
+ /// We only provide such support for a very limited number of targets.
+-fn self_contained_components(sess: &Session, crate_type: CrateType) -> LinkSelfContainedComponents {
++fn self_contained_components(sess: &Session, _crate_type: CrateType) -> LinkSelfContainedComponents {
+     // Turn the backwards compatible bool values for `self_contained` into fully inferred
+     // `LinkSelfContainedComponents`.
+     let self_contained =
+@@ -1730,10 +1730,6 @@ fn self_contained_components(sess: &Session, crate_type: CrateType) -> LinkSelfC
+                     return components;
+                 }
+ 
+-                // FIXME: Find a better heuristic for "native musl toolchain is available",
+-                // based on host and linker path, for example.
+-                // (https://github.com/rust-lang/rust/pull/71769#issuecomment-626330237).
+-                LinkSelfContainedDefault::InferredForMusl => sess.crt_static(Some(crate_type)),
+                 LinkSelfContainedDefault::InferredForMingw => {
+                     sess.host == sess.target
+                         && sess.target.vendor != "uwp"
+diff --git a/compiler/rustc_target/src/spec/base/linux_musl.rs b/compiler/rustc_target/src/spec/base/linux_musl.rs
+index 5117cadbee0..36d64059d59 100644
+--- a/compiler/rustc_target/src/spec/base/linux_musl.rs
++++ b/compiler/rustc_target/src/spec/base/linux_musl.rs
+@@ -1,13 +1,9 @@
+-use crate::spec::crt_objects;
+-use crate::spec::{base, LinkSelfContainedDefault, TargetOptions};
++use crate::spec::{base, TargetOptions};
+ 
+ pub fn opts() -> TargetOptions {
+     let mut base = base::linux::opts();
+ 
+     base.env = "musl".into();
+-    base.pre_link_objects_self_contained = crt_objects::pre_musl_self_contained();
+-    base.post_link_objects_self_contained = crt_objects::post_musl_self_contained();
+-    base.link_self_contained = LinkSelfContainedDefault::InferredForMusl;
+ 
+     // These targets statically link libc by default
+     base.crt_static_default = true;
+diff --git a/compiler/rustc_target/src/spec/crt_objects.rs b/compiler/rustc_target/src/spec/crt_objects.rs
+index 53f710b8f9e..2a4eec15f20 100644
+--- a/compiler/rustc_target/src/spec/crt_objects.rs
++++ b/compiler/rustc_target/src/spec/crt_objects.rs
+@@ -61,28 +61,6 @@ pub(super) fn all(obj: &'static str) -> CrtObjects {
+     ])
+ }
+ 
+-pub(super) fn pre_musl_self_contained() -> CrtObjects {
+-    new(&[
+-        (LinkOutputKind::DynamicNoPicExe, &["crt1.o", "crti.o", "crtbegin.o"]),
+-        (LinkOutputKind::DynamicPicExe, &["Scrt1.o", "crti.o", "crtbeginS.o"]),
+-        (LinkOutputKind::StaticNoPicExe, &["crt1.o", "crti.o", "crtbegin.o"]),
+-        (LinkOutputKind::StaticPicExe, &["rcrt1.o", "crti.o", "crtbeginS.o"]),
+-        (LinkOutputKind::DynamicDylib, &["crti.o", "crtbeginS.o"]),
+-        (LinkOutputKind::StaticDylib, &["crti.o", "crtbeginS.o"]),
+-    ])
+-}
+-
+-pub(super) fn post_musl_self_contained() -> CrtObjects {
+-    new(&[
+-        (LinkOutputKind::DynamicNoPicExe, &["crtend.o", "crtn.o"]),
+-        (LinkOutputKind::DynamicPicExe, &["crtendS.o", "crtn.o"]),
+-        (LinkOutputKind::StaticNoPicExe, &["crtend.o", "crtn.o"]),
+-        (LinkOutputKind::StaticPicExe, &["crtendS.o", "crtn.o"]),
+-        (LinkOutputKind::DynamicDylib, &["crtendS.o", "crtn.o"]),
+-        (LinkOutputKind::StaticDylib, &["crtendS.o", "crtn.o"]),
+-    ])
+-}
+-
+ pub(super) fn pre_mingw_self_contained() -> CrtObjects {
+     new(&[
+         (LinkOutputKind::DynamicNoPicExe, &["crt2.o", "rsbegin.o"]),
+diff --git a/compiler/rustc_target/src/spec/mod.rs b/compiler/rustc_target/src/spec/mod.rs
+index f04799482c8..794b813d617 100644
+--- a/compiler/rustc_target/src/spec/mod.rs
++++ b/compiler/rustc_target/src/spec/mod.rs
+@@ -513,9 +513,6 @@ pub enum LinkSelfContainedDefault {
+     /// The target spec explicitly disables self-contained linking.
+     False,
+ 
+-    /// The target spec requests that the self-contained mode is inferred, in the context of musl.
+-    InferredForMusl,
+-
+     /// The target spec requests that the self-contained mode is inferred, in the context of mingw.
+     InferredForMingw,
+ 
+@@ -532,7 +529,6 @@ fn from_str(s: &str) -> Result<LinkSelfContainedDefault, ()> {
+         Ok(match s {
+             "false" => LinkSelfContainedDefault::False,
+             "true" | "wasm" => LinkSelfContainedDefault::True,
+-            "musl" => LinkSelfContainedDefault::InferredForMusl,
+             "mingw" => LinkSelfContainedDefault::InferredForMingw,
+             _ => return Err(()),
+         })
+@@ -554,7 +550,6 @@ fn to_json(&self) -> Json {
+             // Stable backwards-compatible values
+             LinkSelfContainedDefault::True => "true".to_json(),
+             LinkSelfContainedDefault::False => "false".to_json(),
+-            LinkSelfContainedDefault::InferredForMusl => "musl".to_json(),
+             LinkSelfContainedDefault::InferredForMingw => "mingw".to_json(),
+         }
+     }
+diff --git a/config.example.toml b/config.example.toml
+index e5df28a49af..c61dbb227c1 100644
+--- a/config.example.toml
++++ b/config.example.toml
+@@ -589,14 +589,6 @@ change-id = 116881
+ # behavior -- this may lead to miscompilations or other bugs.
+ #description = ""
+ 
+-# The root location of the musl installation directory. The library directory
+-# will also need to contain libunwind.a for an unwinding implementation. Note
+-# that this option only makes sense for musl targets that produce statically
+-# linked binaries.
+-#
+-# Defaults to /usr on musl hosts. Has no default otherwise.
+-#musl-root = <platform specific> (path)
+-
+ # By default the `rustc` executable is built with `-Wl,-rpath` flags on Unix
+ # platforms to ensure that the compiler is usable by default from the build
+ # directory (as it links to a number of dynamic libraries). This may not be
+@@ -785,15 +777,6 @@ change-id = 116881
+ # only use static libraries. If unset, the target's default linkage is used.
+ #crt-static = <platform-specific> (bool)
+ 
+-# The root location of the musl installation directory. The library directory
+-# will also need to contain libunwind.a for an unwinding implementation. Note
+-# that this option only makes sense for musl targets that produce statically
+-# linked binaries.
+-#musl-root = build.musl-root (path)
+-
+-# The full path to the musl libdir.
+-#musl-libdir = musl-root/lib
+-
+ # The root location of the `wasm32-wasi` sysroot. Only used for the
+ # `wasm32-wasi` target. If you are building wasm32-wasi target, make sure to
+ # create a `[target.wasm32-wasi]` section and move this field there.
+diff --git a/src/bootstrap/configure.py b/src/bootstrap/configure.py
+index 544a42d9ada..05b21893fac 100755
+--- a/src/bootstrap/configure.py
++++ b/src/bootstrap/configure.py
+@@ -99,38 +99,6 @@ v("llvm-config", None, "set path to llvm-config")
+ v("llvm-filecheck", None, "set path to LLVM's FileCheck utility")
+ v("python", "build.python", "set path to python")
+ v("android-ndk", "build.android-ndk", "set path to Android NDK")
+-v("musl-root", "target.x86_64-unknown-linux-musl.musl-root",
+-  "MUSL root installation directory (deprecated)")
+-v("musl-root-x86_64", "target.x86_64-unknown-linux-musl.musl-root",
+-  "x86_64-unknown-linux-musl install directory")
+-v("musl-root-i586", "target.i586-unknown-linux-musl.musl-root",
+-  "i586-unknown-linux-musl install directory")
+-v("musl-root-i686", "target.i686-unknown-linux-musl.musl-root",
+-  "i686-unknown-linux-musl install directory")
+-v("musl-root-arm", "target.arm-unknown-linux-musleabi.musl-root",
+-  "arm-unknown-linux-musleabi install directory")
+-v("musl-root-armhf", "target.arm-unknown-linux-musleabihf.musl-root",
+-  "arm-unknown-linux-musleabihf install directory")
+-v("musl-root-armv5te", "target.armv5te-unknown-linux-musleabi.musl-root",
+-  "armv5te-unknown-linux-musleabi install directory")
+-v("musl-root-armv7", "target.armv7-unknown-linux-musleabi.musl-root",
+-  "armv7-unknown-linux-musleabi install directory")
+-v("musl-root-armv7hf", "target.armv7-unknown-linux-musleabihf.musl-root",
+-  "armv7-unknown-linux-musleabihf install directory")
+-v("musl-root-aarch64", "target.aarch64-unknown-linux-musl.musl-root",
+-  "aarch64-unknown-linux-musl install directory")
+-v("musl-root-mips", "target.mips-unknown-linux-musl.musl-root",
+-  "mips-unknown-linux-musl install directory")
+-v("musl-root-mipsel", "target.mipsel-unknown-linux-musl.musl-root",
+-  "mipsel-unknown-linux-musl install directory")
+-v("musl-root-mips64", "target.mips64-unknown-linux-muslabi64.musl-root",
+-  "mips64-unknown-linux-muslabi64 install directory")
+-v("musl-root-mips64el", "target.mips64el-unknown-linux-muslabi64.musl-root",
+-  "mips64el-unknown-linux-muslabi64 install directory")
+-v("musl-root-riscv32gc", "target.riscv32gc-unknown-linux-musl.musl-root",
+-  "riscv32gc-unknown-linux-musl install directory")
+-v("musl-root-riscv64gc", "target.riscv64gc-unknown-linux-musl.musl-root",
+-  "riscv64gc-unknown-linux-musl install directory")
+ v("qemu-armhf-rootfs", "target.arm-unknown-linux-gnueabihf.qemu-rootfs",
+   "rootfs in qemu testing, you probably don't want to use this")
+ v("qemu-aarch64-rootfs", "target.aarch64-unknown-linux-gnu.qemu-rootfs",
+diff --git a/src/bootstrap/src/core/build_steps/compile.rs b/src/bootstrap/src/core/build_steps/compile.rs
+index 7021a954358..26d0c7644fa 100644
+--- a/src/bootstrap/src/core/build_steps/compile.rs
++++ b/src/bootstrap/src/core/build_steps/compile.rs
+@@ -308,38 +308,7 @@ fn copy_self_contained_objects(
+ 
+     // Copies the libc and CRT objects.
+     //
+-    // rustc historically provides a more self-contained installation for musl targets
+-    // not requiring the presence of a native musl toolchain. For example, it can fall back
+-    // to using gcc from a glibc-targeting toolchain for linking.
+-    // To do that we have to distribute musl startup objects as a part of Rust toolchain
+-    // and link with them manually in the self-contained mode.
+-    if target.contains("musl") && !target.contains("unikraft") {
+-        let srcdir = builder.musl_libdir(target).unwrap_or_else(|| {
+-            panic!("Target {:?} does not have a \"musl-libdir\" key", target.triple)
+-        });
+-        for &obj in &["libc.a", "crt1.o", "Scrt1.o", "rcrt1.o", "crti.o", "crtn.o"] {
+-            copy_and_stamp(
+-                builder,
+-                &libdir_self_contained,
+-                &srcdir,
+-                obj,
+-                &mut target_deps,
+-                DependencyType::TargetSelfContained,
+-            );
+-        }
+-        let crt_path = builder.ensure(llvm::CrtBeginEnd { target });
+-        for &obj in &["crtbegin.o", "crtbeginS.o", "crtend.o", "crtendS.o"] {
+-            let src = crt_path.join(obj);
+-            let target = libdir_self_contained.join(obj);
+-            builder.copy(&src, &target);
+-            target_deps.push((target, DependencyType::TargetSelfContained));
+-        }
+-
+-        if !target.starts_with("s390x") {
+-            let libunwind_path = copy_llvm_libunwind(builder, target, &libdir_self_contained);
+-            target_deps.push((libunwind_path, DependencyType::TargetSelfContained));
+-        }
+-    } else if target.contains("-wasi") {
++    if target.contains("-wasi") {
+         let srcdir = builder
+             .wasi_root(target)
+             .unwrap_or_else(|| {
+@@ -436,15 +405,6 @@ pub fn std_cargo(builder: &Builder<'_>, target: TargetSelection, stage: u32, car
+             .arg("--manifest-path")
+             .arg(builder.src.join("library/sysroot/Cargo.toml"));
+ 
+-        // Help the libc crate compile by assisting it in finding various
+-        // sysroot native libraries.
+-        if target.contains("musl") {
+-            if let Some(p) = builder.musl_libdir(target) {
+-                let root = format!("native={}", p.to_str().unwrap());
+-                cargo.rustflag("-L").rustflag(&root);
+-            }
+-        }
+-
+         if target.contains("-wasi") {
+             if let Some(p) = builder.wasi_root(target) {
+                 let root = format!(
+diff --git a/src/bootstrap/src/core/config/config.rs b/src/bootstrap/src/core/config/config.rs
+index 0a9175aa3ea..d286af22643 100644
+--- a/src/bootstrap/src/core/config/config.rs
++++ b/src/bootstrap/src/core/config/config.rs
+@@ -269,8 +269,6 @@ pub struct Config {
+     pub print_step_rusage: bool,
+     pub missing_tools: bool,
+ 
+-    // Fallback musl-root for all targets
+-    pub musl_root: Option<PathBuf>,
+     pub prefix: Option<PathBuf>,
+     pub sysconfdir: Option<PathBuf>,
+     pub datadir: Option<PathBuf>,
+@@ -528,8 +526,6 @@ pub struct Target {
+     pub profiler: Option<StringOrBool>,
+     pub rpath: Option<bool>,
+     pub crt_static: Option<bool>,
+-    pub musl_root: Option<PathBuf>,
+-    pub musl_libdir: Option<PathBuf>,
+     pub wasi_root: Option<PathBuf>,
+     pub qemu_rootfs: Option<PathBuf>,
+     pub no_std: bool,
+@@ -998,7 +994,6 @@ struct Rust {
+         default_linker: Option<String> = "default-linker",
+         channel: Option<String> = "channel",
+         description: Option<String> = "description",
+-        musl_root: Option<String> = "musl-root",
+         rpath: Option<bool> = "rpath",
+         verbose_tests: Option<bool> = "verbose-tests",
+         optimize_tests: Option<bool> = "optimize-tests",
+@@ -1046,8 +1041,6 @@ struct TomlTarget {
+         profiler: Option<StringOrBool> = "profiler",
+         rpath: Option<bool> = "rpath",
+         crt_static: Option<bool> = "crt-static",
+-        musl_root: Option<String> = "musl-root",
+-        musl_libdir: Option<String> = "musl-libdir",
+         wasi_root: Option<String> = "wasi-root",
+         qemu_rootfs: Option<String> = "qemu-rootfs",
+         no_std: Option<bool> = "no-std",
+@@ -1437,7 +1430,6 @@ fn get_table(option: &str) -> Result<TomlConfig, toml::de::Error> {
+                 .parallel_compiler
+                 .unwrap_or(config.channel == "dev" || config.channel == "nightly");
+             config.rustc_default_linker = rust.default_linker;
+-            config.musl_root = rust.musl_root.map(PathBuf::from);
+             config.save_toolstates = rust.save_toolstates.map(PathBuf::from);
+             set(
+                 &mut config.deny_warnings,
+@@ -1606,8 +1598,6 @@ fn get_table(option: &str) -> Result<TomlConfig, toml::de::Error> {
+                 target.ranlib = cfg.ranlib.map(PathBuf::from);
+                 target.linker = cfg.linker.map(PathBuf::from);
+                 target.crt_static = cfg.crt_static;
+-                target.musl_root = cfg.musl_root.map(PathBuf::from);
+-                target.musl_libdir = cfg.musl_libdir.map(PathBuf::from);
+                 target.wasi_root = cfg.wasi_root.map(PathBuf::from);
+                 target.qemu_rootfs = cfg.qemu_rootfs.map(PathBuf::from);
+                 target.sanitizers = cfg.sanitizers;
+diff --git a/src/bootstrap/src/core/sanity.rs b/src/bootstrap/src/core/sanity.rs
+index eec3be66a12..a2d1cb5dfbf 100644
+--- a/src/bootstrap/src/core/sanity.rs
++++ b/src/bootstrap/src/core/sanity.rs
+@@ -11,7 +11,6 @@
+ use std::collections::HashMap;
+ use std::env;
+ use std::ffi::{OsStr, OsString};
+-use std::fs;
+ use std::path::PathBuf;
+ use std::process::Command;
+ 
+@@ -215,28 +214,6 @@ pub fn check(build: &mut Build) {
+             continue;
+         }
+ 
+-        // Make sure musl-root is valid.
+-        if target.contains("musl") && !target.contains("unikraft") {
+-            // If this is a native target (host is also musl) and no musl-root is given,
+-            // fall back to the system toolchain in /usr before giving up
+-            if build.musl_root(*target).is_none() && build.config.build == *target {
+-                let target = build.config.target_config.entry(*target).or_default();
+-                target.musl_root = Some("/usr".into());
+-            }
+-            match build.musl_libdir(*target) {
+-                Some(libdir) => {
+-                    if fs::metadata(libdir.join("libc.a")).is_err() {
+-                        panic!("couldn't find libc.a in musl libdir: {}", libdir.display());
+-                    }
+-                }
+-                None => panic!(
+-                    "when targeting MUSL either the rust.musl-root \
+-                            option or the target.$TARGET.musl-root option must \
+-                            be specified in config.toml"
+-                ),
+-            }
+-        }
+-
+         if need_cmake && target.contains("msvc") {
+             // There are three builds of cmake on windows: MSVC, MinGW, and
+             // Cygwin. The Cygwin build does not have generators for Visual
+diff --git a/src/bootstrap/src/lib.rs b/src/bootstrap/src/lib.rs
+index d933a8bc37f..9900357aede 100644
+--- a/src/bootstrap/src/lib.rs
++++ b/src/bootstrap/src/lib.rs
+@@ -1306,25 +1306,6 @@ fn crt_static(&self, target: TargetSelection) -> Option<bool> {
+         }
+     }
+ 
+-    /// Returns the "musl root" for this `target`, if defined
+-    fn musl_root(&self, target: TargetSelection) -> Option<&Path> {
+-        self.config
+-            .target_config
+-            .get(&target)
+-            .and_then(|t| t.musl_root.as_ref())
+-            .or_else(|| self.config.musl_root.as_ref())
+-            .map(|p| &**p)
+-    }
+-
+-    /// Returns the "musl libdir" for this `target`.
+-    fn musl_libdir(&self, target: TargetSelection) -> Option<PathBuf> {
+-        let t = self.config.target_config.get(&target)?;
+-        if let libdir @ Some(_) = &t.musl_libdir {
+-            return libdir.clone();
+-        }
+-        self.musl_root(target).map(|root| root.join("lib"))
+-    }
+-
+     /// Returns the sysroot for the wasi target, if defined
+     fn wasi_root(&self, target: TargetSelection) -> Option<&Path> {
+         self.config.target_config.get(&target).and_then(|t| t.wasi_root.as_ref()).map(|p| &**p)
+diff --git a/src/bootstrap/src/utils/cc_detect.rs b/src/bootstrap/src/utils/cc_detect.rs
+index 52b36ce75f3..797e8ec10f8 100644
+--- a/src/bootstrap/src/utils/cc_detect.rs
++++ b/src/bootstrap/src/utils/cc_detect.rs
+@@ -41,8 +41,6 @@ fn cc2ar(cc: &Path, target: TargetSelection) -> Option<PathBuf> {
+         Some(PathBuf::from(ar))
+     } else if target.contains("msvc") {
+         None
+-    } else if target.contains("musl") {
+-        Some(PathBuf::from("ar"))
+     } else if target.contains("openbsd") {
+         Some(PathBuf::from("ar"))
+     } else if target.contains("vxworks") {
+@@ -201,30 +199,6 @@ fn default_compiler(
+             }
+         }
+ 
+-        "mips-unknown-linux-musl" if compiler == Language::C => {
+-            if cfg.get_compiler().path().to_str() == Some("gcc") {
+-                Some(PathBuf::from("mips-linux-musl-gcc"))
+-            } else {
+-                None
+-            }
+-        }
+-        "mipsel-unknown-linux-musl" if compiler == Language::C => {
+-            if cfg.get_compiler().path().to_str() == Some("gcc") {
+-                Some(PathBuf::from("mipsel-linux-musl-gcc"))
+-            } else {
+-                None
+-            }
+-        }
+-
+-        t if t.contains("musl") && compiler == Language::C => {
+-            if let Some(root) = build.musl_root(target) {
+-                let guess = root.join("bin/musl-gcc");
+-                if guess.exists() { Some(guess) } else { None }
+-            } else {
+-                None
+-            }
+-        }
+-
+         _ => None,
+     }
+ }
+diff --git a/src/ci/docker/host-x86_64/dist-arm-linux/Dockerfile b/src/ci/docker/host-x86_64/dist-arm-linux/Dockerfile
+index 420c42bc9d8..83ff773c08e 100644
+--- a/src/ci/docker/host-x86_64/dist-arm-linux/Dockerfile
++++ b/src/ci/docker/host-x86_64/dist-arm-linux/Dockerfile
+@@ -36,7 +36,6 @@ ENV HOSTS=arm-unknown-linux-gnueabi,aarch64-unknown-linux-musl
+ ENV RUST_CONFIGURE_ARGS \
+       --enable-full-tools \
+       --disable-docs \
+-      --musl-root-aarch64=/usr/local/aarch64-linux-musl \
+       --enable-sanitizers \
+       --enable-profiler \
+       --set target.aarch64-unknown-linux-musl.crt-static=false
+diff --git a/src/ci/docker/host-x86_64/dist-i586-gnu-i586-i686-musl/Dockerfile b/src/ci/docker/host-x86_64/dist-i586-gnu-i586-i686-musl/Dockerfile
+index a62f98b21d2..f949736e866 100644
+--- a/src/ci/docker/host-x86_64/dist-i586-gnu-i586-i686-musl/Dockerfile
++++ b/src/ci/docker/host-x86_64/dist-i586-gnu-i586-i686-musl/Dockerfile
+@@ -58,8 +58,6 @@ COPY scripts/sccache.sh /scripts/
+ RUN sh /scripts/sccache.sh
+ 
+ ENV RUST_CONFIGURE_ARGS \
+-      --musl-root-i586=/musl-i586 \
+-      --musl-root-i686=/musl-i686 \
+       --disable-docs
+ 
+ # Newer binutils broke things on some vms/distros (i.e., linking against
+diff --git a/src/ci/docker/host-x86_64/dist-various-1/Dockerfile b/src/ci/docker/host-x86_64/dist-various-1/Dockerfile
+index 3372baed999..233d3f1551b 100644
+--- a/src/ci/docker/host-x86_64/dist-various-1/Dockerfile
++++ b/src/ci/docker/host-x86_64/dist-various-1/Dockerfile
+@@ -132,10 +132,6 @@ ENV CFLAGS_armv5te_unknown_linux_musleabi="-march=armv5te -marm -mfloat-abi=soft
+     CC_riscv64gc_unknown_none_elf=false
+ 
+ ENV RUST_CONFIGURE_ARGS \
+-      --musl-root-armv5te=/musl-armv5te \
+-      --musl-root-arm=/musl-arm \
+-      --musl-root-armhf=/musl-armhf \
+-      --musl-root-armv7hf=/musl-armv7hf \
+       --disable-docs
+ 
+ ENV SCRIPT \
+diff --git a/src/ci/docker/host-x86_64/dist-various-2/Dockerfile b/src/ci/docker/host-x86_64/dist-various-2/Dockerfile
+index 01b46118b9c..b797c19fec3 100644
+--- a/src/ci/docker/host-x86_64/dist-various-2/Dockerfile
++++ b/src/ci/docker/host-x86_64/dist-various-2/Dockerfile
+@@ -142,7 +142,6 @@ RUN ln -s /usr/include/x86_64-linux-gnu/asm /usr/local/include/asm
+ 
+ ENV RUST_CONFIGURE_ARGS --enable-extended --enable-lld --disable-docs \
+   --set target.wasm32-wasi.wasi-root=/wasm32-wasi \
+-  --set target.wasm32-wasi-preview1-threads.wasi-root=/wasm32-wasi-preview1-threads \
+-  --musl-root-armv7=/musl-armv7
++  --set target.wasm32-wasi-preview1-threads.wasi-root=/wasm32-wasi-preview1-threads
+ 
+ ENV SCRIPT python3 ../x.py dist --host='' --target $TARGETS
+diff --git a/src/ci/docker/host-x86_64/dist-x86_64-musl/Dockerfile b/src/ci/docker/host-x86_64/dist-x86_64-musl/Dockerfile
+index c9a6a2dd069..30eda009dee 100644
+--- a/src/ci/docker/host-x86_64/dist-x86_64-musl/Dockerfile
++++ b/src/ci/docker/host-x86_64/dist-x86_64-musl/Dockerfile
+@@ -35,7 +35,6 @@ RUN sh /scripts/sccache.sh
+ ENV HOSTS=x86_64-unknown-linux-musl
+ 
+ ENV RUST_CONFIGURE_ARGS \
+-      --musl-root-x86_64=/usr/local/x86_64-linux-musl \
+       --enable-extended \
+       --enable-sanitizers \
+       --enable-profiler \
+diff --git a/src/ci/docker/host-x86_64/test-various/Dockerfile b/src/ci/docker/host-x86_64/test-various/Dockerfile
+index 4fe66014c17..784a947e59c 100644
+--- a/src/ci/docker/host-x86_64/test-various/Dockerfile
++++ b/src/ci/docker/host-x86_64/test-various/Dockerfile
+@@ -39,7 +39,6 @@ COPY scripts/sccache.sh /scripts/
+ RUN sh /scripts/sccache.sh
+ 
+ ENV RUST_CONFIGURE_ARGS \
+-  --musl-root-x86_64=/usr/local/x86_64-linux-musl \
+   --set build.nodejs=/node-v18.12.0-linux-x64/bin/node \
+   --set rust.lld
+ 
+-- 
+2.44.2
+

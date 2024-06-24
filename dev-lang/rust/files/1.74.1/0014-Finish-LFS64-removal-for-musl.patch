@@ -1,0 +1,101 @@
+From e9a94deaa0353ae00c652a7444a60ddb6ae2bbb8 Mon Sep 17 00:00:00 2001
+From: Samuel Holland <samuel@sholland.org>
+Date: Mon, 28 Aug 2023 02:15:51 -0500
+Subject: [PATCH 14/14] Finish LFS64 removal for musl
+
+---
+ library/std/src/os/linux/fs.rs | 2 +-
+ library/std/src/sys/unix/fd.rs | 8 ++++----
+ library/std/src/sys/unix/fs.rs | 9 ++++-----
+ 3 files changed, 9 insertions(+), 10 deletions(-)
+
+diff --git a/library/std/src/os/linux/fs.rs b/library/std/src/os/linux/fs.rs
+index 479bbcc17a8..23513b5d676 100644
+--- a/library/std/src/os/linux/fs.rs
++++ b/library/std/src/os/linux/fs.rs
+@@ -329,7 +329,7 @@ pub trait MetadataExt {
+ impl MetadataExt for Metadata {
+     #[allow(deprecated)]
+     fn as_raw_stat(&self) -> &raw::stat {
+-        unsafe { &*(self.as_inner().as_inner() as *const libc::stat64 as *const raw::stat) }
++        unsafe { &*(self.as_inner().as_inner() as *const libc::stat as *const raw::stat) }
+     }
+     fn st_dev(&self) -> u64 {
+         self.as_inner().as_inner().st_dev as u64
+diff --git a/library/std/src/sys/unix/fd.rs b/library/std/src/sys/unix/fd.rs
+index 6c4f408426a..3962ec6fc1b 100644
+--- a/library/std/src/sys/unix/fd.rs
++++ b/library/std/src/sys/unix/fd.rs
+@@ -126,9 +126,9 @@ pub fn read_to_end(&self, buf: &mut Vec<u8>) -> io::Result<usize> {
+     }
+ 
+     pub fn read_at(&self, buf: &mut [u8], offset: u64) -> io::Result<usize> {
+-        #[cfg(not(any(target_os = "linux", target_os = "android", target_os = "hurd")))]
++        #[cfg(not(any(target_os = "android", target_os = "hurd")))]
+         use libc::pread as pread64;
+-        #[cfg(any(target_os = "linux", target_os = "android", target_os = "hurd"))]
++        #[cfg(any(target_os = "android", target_os = "hurd"))]
+         use libc::pread64;
+ 
+         unsafe {
+@@ -285,9 +285,9 @@ pub fn is_write_vectored(&self) -> bool {
+     }
+ 
+     pub fn write_at(&self, buf: &[u8], offset: u64) -> io::Result<usize> {
+-        #[cfg(not(any(target_os = "linux", target_os = "android", target_os = "hurd")))]
++        #[cfg(not(any(target_os = "android", target_os = "hurd")))]
+         use libc::pwrite as pwrite64;
+-        #[cfg(any(target_os = "linux", target_os = "android", target_os = "hurd"))]
++        #[cfg(any(target_os = "android", target_os = "hurd"))]
+         use libc::pwrite64;
+ 
+         unsafe {
+diff --git a/library/std/src/sys/unix/fs.rs b/library/std/src/sys/unix/fs.rs
+index 764e1f25790..ca13aad3846 100644
+--- a/library/std/src/sys/unix/fs.rs
++++ b/library/std/src/sys/unix/fs.rs
+@@ -46,10 +46,11 @@
+     target_os = "hurd",
+ ))]
+ use libc::dirfd;
+-#[cfg(any(target_os = "linux", target_os = "emscripten", target_os = "hurd"))]
++#[cfg(any(target_os = "emscripten", target_os = "hurd"))]
+ use libc::fstatat64;
+ #[cfg(any(
+     target_os = "android",
++    target_os = "linux",
+     target_os = "solaris",
+     target_os = "fuchsia",
+     target_os = "redox",
+@@ -58,7 +59,7 @@
+     target_os = "vita",
+ ))]
+ use libc::readdir as readdir64;
+-#[cfg(any(target_os = "linux", target_os = "hurd"))]
++#[cfg(target_os = "hurd")]
+ use libc::readdir64;
+ #[cfg(any(target_os = "emscripten", target_os = "l4re"))]
+ use libc::readdir64_r;
+@@ -82,18 +83,16 @@
+     lstat as lstat64, off64_t, open as open64, stat as stat64,
+ };
+ #[cfg(not(any(
+-    target_os = "linux",
+     target_os = "emscripten",
+     target_os = "l4re",
+     target_os = "android",
+     target_os = "hurd",
+ )))]
+ use libc::{
+-    dirent as dirent64, fstat as fstat64, ftruncate as ftruncate64, lseek as lseek64,
++    dirent as dirent64, fstat as fstat64, fstatat as fstatat64, ftruncate as ftruncate64, lseek as lseek64,
+     lstat as lstat64, off_t as off64_t, open as open64, stat as stat64,
+ };
+ #[cfg(any(
+-    target_os = "linux",
+     target_os = "emscripten",
+     target_os = "l4re",
+     target_os = "hurd"
+-- 
+2.44.2
+

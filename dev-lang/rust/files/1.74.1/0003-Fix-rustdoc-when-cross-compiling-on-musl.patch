@@ -1,0 +1,45 @@
+From 411daf0284e09b7a3fc35cd542211d400637d123 Mon Sep 17 00:00:00 2001
+From: Samuel Holland <samuel@sholland.org>
+Date: Sat, 2 Dec 2017 17:25:44 -0600
+Subject: [PATCH 03/14] Fix rustdoc when cross-compiling on musl
+
+musl can't handle foreign-architecture libraries in LD_LIBRARY_PATH.
+---
+ src/bootstrap/bin/rustdoc.rs | 7 ++-----
+ 1 file changed, 2 insertions(+), 5 deletions(-)
+
+diff --git a/src/bootstrap/bin/rustdoc.rs b/src/bootstrap/bin/rustdoc.rs
+index 6561c1c1933..3bd7ee106cf 100644
+--- a/src/bootstrap/bin/rustdoc.rs
++++ b/src/bootstrap/bin/rustdoc.rs
+@@ -25,9 +25,6 @@ fn main() {
+     // is passed (a bit janky...)
+     let target = args.windows(2).find(|w| &*w[0] == "--target").and_then(|w| w[1].to_str());
+ 
+-    let mut dylib_path = dylib_path();
+-    dylib_path.insert(0, PathBuf::from(libdir.clone()));
+-
+     let mut cmd = Command::new(rustdoc);
+ 
+     if target.is_some() {
+@@ -40,7 +37,7 @@ fn main() {
+     }
+ 
+     cmd.args(&args);
+-    cmd.env(dylib_path_var(), env::join_paths(&dylib_path).unwrap());
++    cmd.env(dylib_path_var(), PathBuf::from(libdir.clone()));
+ 
+     // Force all crates compiled by this compiler to (a) be unstable and (b)
+     // allow the `rustc_private` feature to link to other unstable crates
+@@ -72,7 +69,7 @@ fn main() {
+         eprintln!(
+             "rustdoc command: {:?}={:?} {:?}",
+             dylib_path_var(),
+-            env::join_paths(&dylib_path).unwrap(),
++            PathBuf::from(libdir.clone()),
+             cmd,
+         );
+         eprintln!("sysroot: {sysroot:?}");
+-- 
+2.44.2
+

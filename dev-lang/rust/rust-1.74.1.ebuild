@@ -163,11 +163,21 @@ RESTRICT="test"
 VERIFY_SIG_OPENPGP_KEY_PATH=/usr/share/openpgp-keys/rust.asc
 
 PATCHES=(
-	"${FILESDIR}"/1.74.1-cross-compile-libz.patch
-	#"${FILESDIR}"/1.72.0-bump-libc-deps-to-0.2.146.patch  # pending refresh
-	"${FILESDIR}"/1.70.0-ignore-broken-and-non-applicable-tests.patch
-	"${FILESDIR}"/1.62.1-musl-dynamic-linking.patch
 	"${FILESDIR}"/1.67.0-doc-wasm.patch
+	"${FILESDIR}"/${PV}/0001-Fix-LLVM-build.patch
+	"${FILESDIR}"/${PV}/0002-Fix-linking-to-zlib-when-cross-compiling.patch
+	"${FILESDIR}"/${PV}/0003-Fix-rustdoc-when-cross-compiling-on-musl.patch
+	"${FILESDIR}"/${PV}/0004-Remove-musl_root-and-CRT-fallback-from-musl-targets.patch
+	"${FILESDIR}"/${PV}/0005-Prefer-libgcc_eh-over-libunwind-for-musl.patch
+	"${FILESDIR}"/${PV}/0006-Link-libssp_nonshared.a-on-all-musl-targets.patch
+	"${FILESDIR}"/${PV}/0007-test-failed-doctest-output-Fix-normalization.patch
+	"${FILESDIR}"/${PV}/0008-test-sysroot-crates-are-unstable-Fix-test-when-rpath.patch
+	"${FILESDIR}"/${PV}/0009-test-use-extern-for-plugins-Don-t-assume-multilib.patch
+	"${FILESDIR}"/${PV}/0010-Ignore-broken-and-non-applicable-tests.patch
+	"${FILESDIR}"/${PV}/0011-Link-stage-2-tools-dynamically-to-libstd.patch
+	"${FILESDIR}"/${PV}/0012-Move-debugger-scripts-to-usr-share-rust.patch
+	"${FILESDIR}"/${PV}/0013-Add-gentoo-target-specs.patch
+	"${FILESDIR}"/${PV}/0014-Finish-LFS64-removal-for-musl.patch
 )
 
 S="${WORKDIR}/${MY_P}-src"
