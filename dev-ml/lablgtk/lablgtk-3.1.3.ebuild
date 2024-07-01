@@ -21,7 +21,7 @@ DEPEND="
 	app-text/gtkspell:3=
 	x11-libs/gtk+:3=
 	dev-ml/cairo2:=
-	x11-libs/gtksourceview:3.0=
+	sourceview? ( x11-libs/gtksourceview:3.0= )
 "
 RDEPEND="${DEPEND}"
 PDEPEND="sourceview? ( dev-ml/lablgtk-sourceview:${SLOT} )"
