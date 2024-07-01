@@ -382,6 +382,7 @@ acct-user_pkg_preinst() {
 		# Path might be missing due to INSTALL_MASK, etc.
 		# https://bugs.gentoo.org/691478
 		if [[ ! -e "${ED}/${_ACCT_USER_HOME#/}" ]]; then
+			return
 			eerror "Home directory is missing from the installation image:"
 			eerror "  ${_ACCT_USER_HOME}"
 			eerror "Check INSTALL_MASK for entries that would cause this."
