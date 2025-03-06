@@ -1,0 +1,25 @@
+From 2fadecfb0b647cefa0f3c13f5ea7e3da2b91595b Mon Sep 17 00:00:00 2001
+From: Samuel Holland <samuel@sholland.org>
+Date: Sat, 9 Sep 2017 00:14:16 -0500
+Subject: [PATCH 05/11] Prefer libgcc_eh over libunwind for musl
+
+---
+ library/unwind/src/lib.rs | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/library/unwind/src/lib.rs b/library/unwind/src/lib.rs
+index 544d9fbf1ae..4fe281297a9 100644
+--- a/library/unwind/src/lib.rs
++++ b/library/unwind/src/lib.rs
+@@ -63,7 +63,7 @@
+         #[link(name = "unwind", cfg(not(target_feature = "crt-static")))]
+         extern "C" {}
+     } else {
+-        #[link(name = "unwind", kind = "static", modifiers = "-bundle", cfg(target_feature = "crt-static"))]
++        #[link(name = "gcc_eh", kind = "static", modifiers = "-bundle", cfg(target_feature = "crt-static"))]
+         #[link(name = "gcc_s", cfg(not(target_feature = "crt-static")))]
+         extern "C" {}
+     }
+-- 
+2.45.2
+
