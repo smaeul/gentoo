@@ -1,0 +1,50 @@
+From d2b8fe7458896b6fe35c4cad6699420add42b52f Mon Sep 17 00:00:00 2001
+From: Samuel Holland <samuel@sholland.org>
+Date: Sun, 16 Sep 2018 16:38:48 +0000
+Subject: [PATCH 09/11] Ignore broken and non-applicable tests
+
+env-funky-keys: can't handle LD_PRELOAD (e.g. sandbox)
+long-linker-command-lines: takes >10 minutes to run (but still passes)
+sysroot-crates-are-unstable: can't run rustc without RPATH
+---
+ tests/run-make/long-linker-command-lines/Makefile   | 2 ++
+ tests/run-make/sysroot-crates-are-unstable/Makefile | 2 ++
+ tests/ui/process/env-funky-keys.rs                  | 1 +
+ 3 files changed, 5 insertions(+)
+
+diff --git a/tests/run-make/long-linker-command-lines/Makefile b/tests/run-make/long-linker-command-lines/Makefile
+index b573038e344..2692a26bc3c 100644
+--- a/tests/run-make/long-linker-command-lines/Makefile
++++ b/tests/run-make/long-linker-command-lines/Makefile
+@@ -1,4 +1,6 @@
+ # ignore-cross-compile
++# ignore-test
++
+ include ../tools.mk
+ 
+ export LD_LIBRARY_PATH := $(HOST_RPATH_DIR)
+diff --git a/tests/run-make/sysroot-crates-are-unstable/Makefile b/tests/run-make/sysroot-crates-are-unstable/Makefile
+index 30c33c5c13d..d733bb1c557 100644
+--- a/tests/run-make/sysroot-crates-are-unstable/Makefile
++++ b/tests/run-make/sysroot-crates-are-unstable/Makefile
+@@ -1,3 +1,5 @@
++# ignore-test
++
+ -include ../tools.mk
+ 
+ all:
+diff --git a/tests/ui/process/env-funky-keys.rs b/tests/ui/process/env-funky-keys.rs
+index 314ccaea015..7f5b9efaa10 100644
+--- a/tests/ui/process/env-funky-keys.rs
++++ b/tests/ui/process/env-funky-keys.rs
+@@ -1,6 +1,7 @@
+ //@ run-pass
+ // Ignore this test on Android, because it segfaults there.
+ 
++//@ ignore-test
+ //@ ignore-android
+ //@ ignore-windows
+ //@ ignore-wasm32 no execve
+-- 
+2.45.2
+
