@@ -1,0 +1,25 @@
+From 164f1cef5f1245a06a1626169a85f44b6614a90f Mon Sep 17 00:00:00 2001
+From: Samuel Holland <samuel@sholland.org>
+Date: Fri, 8 Sep 2017 00:04:29 -0500
+Subject: [PATCH 1/9] Fix LLVM build
+
+---
+ src/bootstrap/src/lib.rs | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/src/bootstrap/src/lib.rs b/src/bootstrap/src/lib.rs
+index ccc115a279f..f35fa2dcbf0 100644
+--- a/src/bootstrap/src/lib.rs
++++ b/src/bootstrap/src/lib.rs
+@@ -1180,7 +1180,7 @@ fn cflags(&self, target: TargetSelection, which: GitRepo, c: CLang) -> Vec<Strin
+             .args()
+             .iter()
+             .map(|s| s.to_string_lossy().into_owned())
+-            .filter(|s| !s.starts_with("-O") && !s.starts_with("/O"))
++            .filter(|s| !s.starts_with("-O") && !s.starts_with("/O") && !s.starts_with("-static"))
+             .collect::<Vec<String>>();
+ 
+         // If we're compiling C++ on macOS then we add a flag indicating that
+-- 
+2.45.2
+

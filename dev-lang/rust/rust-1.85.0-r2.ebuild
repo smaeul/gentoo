@@ -310,6 +310,15 @@ src_prepare() {
 	# then cut a new tag / tarball. Don't add patches to ${FILESDIR}
 	PATCHES=(
 		"${WORKDIR}/rust-patches-${RUST_PATCH_VER}/"
+		"${FILESDIR}"/${PV}/0001-Fix-LLVM-build.patch
+		"${FILESDIR}"/${PV}/0002-Fix-linking-to-zlib-when-cross-compiling.patch
+		"${FILESDIR}"/${PV}/0003-Fix-rustdoc-when-cross-compiling-on-musl.patch
+		"${FILESDIR}"/${PV}/0004-Remove-musl_root-and-CRT-fallback-from-musl-targets.patch
+		"${FILESDIR}"/${PV}/0005-Prefer-libgcc_eh-over-libunwind-for-musl.patch
+		"${FILESDIR}"/${PV}/0006-Link-libssp_nonshared.a-on-all-musl-targets.patch
+		"${FILESDIR}"/${PV}/0007-test-failed-doctest-output-Fix-normalization.patch
+		"${FILESDIR}"/${PV}/0008-Ignore-broken-and-non-applicable-tests.patch
+		"${FILESDIR}"/${PV}/0009-Move-debugger-scripts-to-usr-share-rust.patch
 	)
 
 	if use lto && tc-is-clang && ! tc-ld-is-lld && ! tc-ld-is-mold; then
@@ -525,7 +534,6 @@ src_configure() {
 		if use elibc_musl; then
 			cat <<- _EOF_ >> "${S}"/config.toml
 				crt-static = false
-				musl-root = "$($(tc-getCC) -print-sysroot)/usr"
 			_EOF_
 		fi
 	done
@@ -591,11 +599,6 @@ src_configure() {
 		if use system-llvm; then
 			cat <<- _EOF_ >> "${S}"/config.toml
 				llvm-config = "$(get_llvm_prefix)/bin/llvm-config"
-			_EOF_
-		fi
-		if [[ "${cross_toolchain}" == *-musl* ]]; then
-			cat <<- _EOF_ >> "${S}"/config.toml
-				musl-root = "$(${cross_toolchain}-gcc -print-sysroot)/usr"
 			_EOF_
 		fi
 

@@ -1,0 +1,39 @@
+From 93c5a1b4bb771eba4f42845e56efc5cb49d2368d Mon Sep 17 00:00:00 2001
+From: Samuel Holland <samuel@sholland.org>
+Date: Wed, 10 Jan 2018 13:36:41 -0600
+Subject: [PATCH 2/9] Fix linking to zlib when cross-compiling
+
+---
+ compiler/rustc_llvm/build.rs | 9 ++-------
+ 1 file changed, 2 insertions(+), 7 deletions(-)
+
+diff --git a/compiler/rustc_llvm/build.rs b/compiler/rustc_llvm/build.rs
+index d9d28299413..7f9ced02f38 100644
+--- a/compiler/rustc_llvm/build.rs
++++ b/compiler/rustc_llvm/build.rs
+@@ -220,12 +220,8 @@ fn main() {
+     let mut cmd = Command::new(&llvm_config);
+     cmd.arg(llvm_link_arg).arg("--libs");
+ 
+-    // Don't link system libs if cross-compiling unless targeting Windows.
+-    // On Windows system DLLs aren't linked directly, instead import libraries are used.
+-    // These import libraries are independent of the host.
+-    if !is_crossed || target.contains("windows") {
+-        cmd.arg("--system-libs");
+-    }
++    cmd.arg("--system-libs");
++    cmd.args(&components);
+ 
+     // We need libkstat for getHostCPUName on SPARC builds.
+     // See also: https://github.com/llvm/llvm-project/issues/64186
+@@ -259,7 +255,6 @@ fn main() {
+         println!("cargo:rustc-link-lib=z");
+         println!("cargo:rustc-link-lib=execinfo");
+     }
+-    cmd.args(&components);
+ 
+     for lib in output(&mut cmd).split_whitespace() {
+         let mut is_static = false;
+-- 
+2.45.2
+
